@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">OpenWeather</string>
+    <string name="enable_gps">Enable GPS</string>
+    <string name="enable_now">Enable Now</string>
+    <string name="gps_desc">Enable GPS to find your current location.</string>
+    <string name="min">min</string>
+    <string name="current">Current</string>
+    <string name="max">max</string>
+    <string name="current_location">Current location</string>
+    <string name="map">Map</string>
+    <string name="cities">List</string>
+    <string name="try_again">Try Again</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="search_location">search location</string>
+    <string name="weather_icon_desc">weather type</string>
+    <string name="last_updated">Last updated: %1$s</string>
+    <string name="user_location">%1$s, %1$s</string>
+</resources>
