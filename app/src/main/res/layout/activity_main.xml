@@ -72,8 +72,8 @@
 
         <ImageView
             android:id="@+id/tap_to_refresh"
-            android:layout_width="20dp"
-            android:layout_height="16dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginStart="16dp"
             android:background="@android:color/transparent"
             app:layout_constraintBottom_toBottomOf="@+id/last_updated_at"

@@ -49,9 +49,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        binding.weatherForecast.apply {
-            adapter = forecastAdapter
-            layoutManager = LinearLayoutManager(this@MainActivity)
+        with(binding) {
+            weatherForecast.apply {
+                adapter = forecastAdapter
+                layoutManager = LinearLayoutManager(this@MainActivity)
+            }
+            tapToRefresh.setOnClickListener {
+                refreshWeatherData()
+            }
         }
     }
 
@@ -81,15 +86,15 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.currentWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
+                    hideLoading()
                     updateCurrentWeatherViews(resource.data)
-                    showLoading(false)
                 }
                 is Resource.Error -> {
-                    showLoading(false)
+                    hideLoading()
                     showSnackbarErrorMessage(resource.message.toString())
                 }
                 is Resource.Loading -> {
-                    showLoading(true)
+                    showLoading()
                 }
             }
         }
@@ -99,15 +104,15 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.forecastWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
+                    hideLoading()
                     updateWeatherForecastViews(resource.data)
-                    showLoading(false)
                 }
                 is Resource.Error -> {
-                    showLoading(false)
+                    hideLoading()
                     showSnackbarErrorMessage(resource.message.toString())
                 }
                 is Resource.Loading -> {
-                    showLoading(true)
+                    showLoading()
                 }
             }
         }
@@ -129,17 +134,22 @@ class MainActivity : AppCompatActivity() {
         forecastAdapter.differ.submitList(forecast?.daily?.take(5))
     }
 
-    private fun showLoading(show: Boolean) {
+    private fun showLoading() {
         binding.loadingLayout.apply {
-            if (show) visibility = View.VISIBLE else View.GONE
+            visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideLoading() {
+        binding.loadingLayout.apply {
+            visibility = View.GONE
         }
     }
 
     private fun showSnackbarErrorMessage(message: String) {
         binding.weatherLayout.apply {
             val snack = Snackbar.make(this, message, Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.try_again)) {
-                mainViewModel.getCurrentWeather()
-                mainViewModel.getWeatherForecast()
+                refreshWeatherData()
             }
             val button = snack.view.findViewById(com.google.android.material.R.id.snackbar_action) as TextView
             button.apply {
@@ -148,6 +158,11 @@ class MainActivity : AppCompatActivity() {
             }
             snack.show()
         }
+    }
+
+    private fun refreshWeatherData() {
+        mainViewModel.getCurrentWeather()
+        mainViewModel.getWeatherForecast()
     }
 
 }
