@@ -120,6 +120,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateCurrentWeatherViews(current: CurrentWeather?) {
         with(binding) {
+            current?.getCurrentWeatherBackgroundColor()
+                ?.let { ContextCompat.getColor(this@MainActivity, it) }
+                ?.let { weatherLayout.setBackgroundColor(it) }
+            currentWeatherLayout.background = current?.getCurrentWeatherImage()
+                ?.let { ContextCompat.getDrawable(this@MainActivity, it) }
             currentLocation.text = getString(R.string.user_location, current?.name.toString(), current?.sys?.country.toString())
             currentTemp.text = current?.main?.getTemperature()
             currentWeather.text = current?.weather?.firstOrNull()?.main
