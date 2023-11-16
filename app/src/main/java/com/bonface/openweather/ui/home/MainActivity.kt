@@ -1,13 +1,23 @@
 package com.bonface.openweather.ui.home
 
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
 import com.bonface.openweather.data.model.CurrentWeather
@@ -21,6 +31,7 @@ import com.bonface.openweather.utils.PermissionUtils.showEnableGPSDialog
 import com.bonface.openweather.utils.Resource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -56,6 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
             tapToRefresh.setOnClickListener {
                 refreshWeatherData()
+            }
+            favoritePlaces.setOnClickListener {
+
             }
         }
     }
@@ -132,6 +146,7 @@ class MainActivity : AppCompatActivity() {
             minTemperatureValue.text = current?.main?.getMinTemperature()
             currentTemperatureValue.text = current?.main?.getTemperature()
             maxTemperatureValue.text = current?.main?.getMaxTemperature()
+            current?.getCurrentWeatherImage()?.let { updateStatusBarColor(it) }
         }
     }
 
@@ -168,6 +183,19 @@ class MainActivity : AppCompatActivity() {
     private fun refreshWeatherData() {
         mainViewModel.getCurrentWeather()
         mainViewModel.getWeatherForecast()
+    }
+
+    private fun updateStatusBarColor(resource: Int) {
+        val bitMap = BitmapFactory.decodeResource(resources, resource)
+        Palette.Builder(bitMap).generate { result ->
+            result?.let {
+                val dominantSwatch = it.dominantSwatch
+                if (dominantSwatch != null) {
+                    val window: Window = window
+                    window.statusBarColor = dominantSwatch.rgb
+                }
+            }
+        }
     }
 
 }
