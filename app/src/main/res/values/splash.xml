@@ -3,9 +3,8 @@
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#FFD580</item>
-<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/chair</item>-->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.OpenWeather</item>
-<!--        <item name="splashScreenIconSize">@dimen/splash_icon_size</item>-->
     </style>
 
 </resources>

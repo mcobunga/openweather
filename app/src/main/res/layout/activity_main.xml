@@ -47,12 +47,14 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/current_weather"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:textColor="@color/white"
             android:textStyle="bold"
+            android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="@+id/current_temp"
             app:layout_constraintStart_toStartOf="@+id/current_temp"
             app:layout_constraintTop_toBottomOf="@+id/current_temp"
@@ -199,7 +201,8 @@
         android:id="@+id/loading_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/overlay">
+        android:background="@color/overlay"
+        android:visibility="gone">
 
         <ProgressBar
             android:id="@+id/loading_progressbar"

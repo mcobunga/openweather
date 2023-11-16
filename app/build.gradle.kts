@@ -68,7 +68,6 @@ dependencies {
 
     //Splash Screen
     implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
-    implementation("com.jakewharton.timber:timber:5.0.1")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -88,9 +87,6 @@ dependencies {
 
     //Recyclerview
     implementation("androidx.recyclerview:recyclerview:1.3.2")
-
-    //CardView
-    implementation("androidx.cardview:cardview:1.0.0")
 
     //Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -112,12 +108,8 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.0")
     kapt("androidx.room:room-runtime:2.6.0")
 
-    //Glide
-    implementation("com.github.bumptech.glide:glide:4.14.2")
-    kapt("com.github.bumptech.glide:glide:4.14.2")
-
-    //Kotlinx DateTime
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    //Palette
+    implementation("androidx.palette:palette-ktx:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
