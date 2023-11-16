@@ -82,6 +82,9 @@ dependencies {
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.48.1")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
     kapt("androidx.hilt:hilt-compiler:1.1.0")
 
@@ -105,8 +108,8 @@ dependencies {
 
     //Room Database
     implementation("androidx.room:room-runtime:2.6.0")
-    implementation("androidx.room:room-runtime:2.6.0")
-    kapt("androidx.room:room-runtime:2.6.0")
+    implementation("androidx.room:room-ktx:2.6.0")
+    kapt("androidx.room:room-compiler:2.6.0")
 
     //Palette
     implementation("androidx.palette:palette-ktx:1.0.0")

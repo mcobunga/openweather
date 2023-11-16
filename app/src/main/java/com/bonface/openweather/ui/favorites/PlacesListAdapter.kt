@@ -1,4 +1,4 @@
-package com.bonface.openweather.ui.home
+package com.bonface.openweather.ui.favorites
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,12 +6,14 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bonface.openweather.data.model.DailyForecast
+import com.bonface.openweather.databinding.ItemFavoritePlacesBinding
 import com.bonface.openweather.databinding.ItemWeatherForecastBinding
+import com.bonface.openweather.ui.home.ForecastAdapter
 import javax.inject.Inject
 
-class ForecastAdapter @Inject constructor() : RecyclerView.Adapter<ForecastAdapter.ViewHolder>() {
+class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemWeatherForecastBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: ItemFavoritePlacesBinding) : RecyclerView.ViewHolder(binding.root)
 
     private val diffUtil = object : DiffUtil.ItemCallback<DailyForecast>() {
         override fun areItemsTheSame(oldList: DailyForecast, newList: DailyForecast): Boolean {
@@ -25,17 +27,16 @@ class ForecastAdapter @Inject constructor() : RecyclerView.Adapter<ForecastAdapt
     val differ = AsyncListDiffer(this, diffUtil)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemWeatherForecastBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemFavoritePlacesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val forecast = differ.currentList[position]
-        holder.binding.apply {
-            day.text = forecast.getDay()
-            forecast.weather?.firstOrNull()?.getForecastWeatherIcon()
-                ?.let { weather.setImageResource(it) }
-            temperature.text = forecast.temp?.getTemperature()
+        with(holder.binding) {
+            location.text = forecast.getDay()
+            locationTemp.text = forecast.temp?.getTemperature()
+            locationWeather.text = forecast.temp?.getTemperature()
         }
     }
 
