@@ -18,13 +18,16 @@ interface FavoritePlacesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveFavoritePlace(locationEntity: FavoritePlacesEntity)
 
+    @Query("SELECT * FROM $TABLE_FAVORITE_PLACES WHERE is_current =:current")
+    fun getCurrentWeather(current: Int = 1): Flow<List<FavoritePlacesEntity>>
+
     @Delete
-    suspend fun removeFavoritePlace(locationEntity: FavoritePlacesEntity)
+    suspend fun removeLocation(locationEntity: FavoritePlacesEntity)
 
     @Query("DELETE FROM $TABLE_FAVORITE_PLACES")
     suspend fun deleteAll()
 
-    @Query("SELECT * FROM $TABLE_FAVORITE_PLACES WHERE is_current =:current")
-    fun getCurrentUserLocation(current: Int = 1): Flow<List<FavoritePlacesEntity>>
+    @Query("DELETE FROM $TABLE_FAVORITE_PLACES WHERE is_current =:current")
+    fun removeCurrentUserLocation(current: Int = 1)
 
 }

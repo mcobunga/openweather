@@ -1,28 +1,37 @@
 package com.bonface.openweather.ui.home
 
+import android.Manifest
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
-import android.view.View
 import android.view.Window
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
+import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
 import com.bonface.openweather.databinding.ActivityMainBinding
-import com.bonface.openweather.utils.PermissionUtils.getUserCurrentLocation
-import com.bonface.openweather.utils.PermissionUtils.isAccessFineLocationGranted
-import com.bonface.openweather.utils.PermissionUtils.isLocationEnabled
-import com.bonface.openweather.utils.PermissionUtils.requestAccessFineLocationPermission
-import com.bonface.openweather.utils.PermissionUtils.showEnableGPSDialog
 import com.bonface.openweather.utils.Resource
+import com.bonface.openweather.utils.gone
+import com.bonface.openweather.utils.isAccessFineLocationGranted
+import com.bonface.openweather.utils.isLocationEnabled
+import com.bonface.openweather.utils.show
+import com.bonface.openweather.utils.showEnableGPSDialog
+import com.bonface.openweather.utils.toast
 import com.google.android.material.snackbar.Snackbar
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -48,9 +57,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupUI()
+        checkLocationPermission()
+        setLocationObserver()
         setFloatingButtonController()
-        checkForLocationPermission()
-        getUserLocationWeatherInfo()
+        getCachedWeatherInfo()
     }
 
     private fun setupUI() {
@@ -65,37 +75,60 @@ class MainActivity : AppCompatActivity() {
             favoritePlaces.setOnClickListener {
 
             }
+            addFavorite.setOnClickListener {
+
+            }
         }
     }
 
-    private fun checkForLocationPermission() {
+    private fun checkLocationPermission() {
         when {
-            isAccessFineLocationGranted(this) -> {
+            isAccessFineLocationGranted() -> {
                 when {
-                    isLocationEnabled(this) -> {
-                        location = getUserCurrentLocation(this,this)
-                        getUserLocationWeatherInfo()
-                    }
-                    else -> showEnableGPSDialog(this)
+                    isLocationEnabled() -> mainViewModel.getCurrentLocation()
+                    else -> showEnableGPSDialog()
                 }
             }
-            else -> requestAccessFineLocationPermission(this,this )
+            else -> requestAccessFineLocationPermission()
         }
     }
 
-    private fun getUserLocationWeatherInfo() {
-        if (location?.latitude != null && location?.longitude != null) {
-            getUserLocationCurrentWeather(location!!)
-            getUserLocationWeatherForecast(location!!)
+
+    private fun setLocationObserver() {
+        mainViewModel.currentLocation.observe(this@MainActivity) {
+            location = it
+            it?.let { location ->
+                getCurrentWeatherFromRemote(location)
+                getWeatherForecastFromRemote(location)
+            }
         }
     }
 
-    private fun getUserLocationCurrentWeather(location: Location) {
+
+    private fun getCachedWeatherInfo() {
+        lifecycleScope.launchWhenStarted {
+            mainViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
+                if (currentWeather.isNotEmpty()) {
+                    updateWeatherViews(currentWeather)
+                }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            mainViewModel.getWeatherForecastFromDb().collect { dailyForecast ->
+                if (dailyForecast.isNotEmpty()) {
+                    forecastAdapter.differ.submitList(dailyForecast.take(5))
+                }
+            }
+        }
+    }
+
+    private fun getCurrentWeatherFromRemote(location: Location) {
         mainViewModel.currentWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     hideLoading()
-                    updateCurrentWeatherViews(resource.data)
+                    resource.data?.let { mainViewModel.saveCurrentWeatherToDb(it) }
                 }
                 is Resource.Error -> {
                     hideLoading()
@@ -106,64 +139,48 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        mainViewModel.getCurrentWeather(location)
+        mainViewModel.getCurrentWeatherFromRemote(location)
     }
 
-    private fun getUserLocationWeatherForecast(location: Location) {
+    private fun getWeatherForecastFromRemote(location: Location) {
         mainViewModel.forecastWeather.observe(this) { resource ->
             when (resource) {
-                is Resource.Success -> {
-                    hideLoading()
-                    updateWeatherForecastViews(resource.data)
-                }
-                is Resource.Error -> {
-                    hideLoading()
-                    showSnackbarErrorMessage(resource.message.toString())
-                }
-                is Resource.Loading -> {
-                    showLoading()
-                }
+                is Resource.Success -> resource.data?.let { mainViewModel.saveWeatherForecastToDb(it) }
+                is Resource.Error -> showSnackbarErrorMessage(resource.message.toString())
+                is Resource.Loading ->{} //nothing - applying progressbar to only current weather api call
             }
         }
-        mainViewModel.getWeatherForecast(location)
+        mainViewModel.getWeatherForecastFromRemote(location)
     }
 
-    private fun updateCurrentWeatherViews(current: CurrentWeather?) {
+    private fun updateWeatherViews(weather: List<CurrentWeatherEntity>) {
         with(binding) {
-            current?.getCurrentWeatherBackgroundColor()
-                ?.let { ContextCompat.getColor(this@MainActivity, it) }
-                ?.let { weatherLayout.setBackgroundColor(it) }
-            currentWeatherLayout.background = current?.getCurrentWeatherImage()
-                ?.let { ContextCompat.getDrawable(this@MainActivity, it) }
-            currentLocation.text = getString(R.string.user_location, current?.name.toString(), current?.sys?.country.toString())
-            currentTemp.text = current?.main?.getTemperature()
-            currentWeather.text = current?.weather?.firstOrNull()?.main
-            lastUpdatedAt.text = getString(R.string.last_updated, current?.lastUpdated())
-            minTemperatureValue.text = current?.main?.getMinTemperature()
-            currentTemperatureValue.text = current?.main?.getTemperature()
-            maxTemperatureValue.text = current?.main?.getMaxTemperature()
-            current?.getCurrentWeatherImage()?.let { updateStatusBarColor(it) }
+            weather.firstOrNull().apply {
 
-            addFavorite.setOnClickListener {
-                current?.let { location -> mainViewModel.addToFavoritePlacesCurrentUserLocation(location) }
+                this?.getCurrentWeatherBackgroundColor()
+                    ?.let { ContextCompat.getColor(this@MainActivity, it) }
+                    ?.let { weatherLayout.setBackgroundColor(it) }
+
+                currentWeatherLayout.background = this?.getCurrentWeatherImage()
+                    ?.let { ContextCompat.getDrawable(this@MainActivity, it) }
+                currentLocation.text = getString(R.string.user_location, this?.name.toString(), this?.country.toString())
+                currentTemp.text = this?.getTemperature()
+                currentWeather.text = this?.weatherMain
+                lastUpdatedAt.text = getString(R.string.last_updated, this?.lastUpdated())
+                minTemperatureValue.text = this?.getMinTemperature()
+                currentTemperatureValue.text = this?.getTemperature()
+                maxTemperatureValue.text = this?.getMaxTemperature()
+                this?.getCurrentWeatherImage()?.let { updateStatusBarColor(it) }
             }
         }
-    }
-
-    private fun updateWeatherForecastViews(forecast: WeatherForecast?) {
-        forecastAdapter.differ.submitList(forecast?.daily?.take(5))
     }
 
     private fun showLoading() {
-        binding.loadingLayout.apply {
-            visibility = View.VISIBLE
-        }
+        binding.loadingLayout.show()
     }
 
     private fun hideLoading() {
-        binding.loadingLayout.apply {
-            visibility = View.GONE
-        }
+        binding.loadingLayout.gone()
     }
 
     private fun showSnackbarErrorMessage(message: String) {
@@ -182,8 +199,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshWeatherData() {
         if (location != null) {
-            mainViewModel.getCurrentWeather(location!!)
-            mainViewModel.getWeatherForecast(location!!)
+            mainViewModel.getCurrentWeatherFromRemote(location!!)
+            mainViewModel.getWeatherForecastFromRemote(location!!)
         }
     }
 
@@ -208,30 +225,45 @@ class MainActivity : AppCompatActivity() {
                 isAllFabsVisible = if (!isAllFabsVisible!!) {
                     favoritePlaces.show()
                     addFavorite.show()
-                    favoritesActionText.visibility = View.VISIBLE
-                    addFavActionText.visibility = View.VISIBLE
+                    favoritesActionText.show()
+                    addFavActionText.show()
                     fab.extend()
                     true
                 } else {
                     favoritePlaces.hide()
                     addFavorite.hide()
-                    favoritesActionText.visibility = View.GONE
-                    addFavActionText.visibility = View.GONE
+                    favoritesActionText.gone()
+                    addFavActionText.gone()
                     fab.shrink()
                     false
                 }
             }
             favoritePlaces.setOnClickListener {
-                goToFavoritePlaces()
+
             }
         }
     }
 
-    private fun goToFavoritePlaces() {
+    private fun requestAccessFineLocationPermission() {
+        Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(object : PermissionListener {
+                override fun onPermissionGranted(ermissionGrantedResponse: PermissionGrantedResponse) {
+                    mainViewModel.getCurrentLocation()
+                }
 
+                override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
+                    toast("You need to allow location permission")
+                    finish()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(permissionRequest: PermissionRequest, permissionToken: PermissionToken) {
+                    showEnableGPSDialog()
+                }
+
+        }).check()
     }
 
 }
+
 
 
 

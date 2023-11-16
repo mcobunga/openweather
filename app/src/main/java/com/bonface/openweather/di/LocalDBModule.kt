@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.bonface.openweather.data.local.OpenWeatherDatabase
 import com.bonface.openweather.data.local.dao.FavoritePlacesDao
+import com.bonface.openweather.data.local.dao.CurrentWeatherDao
 import com.bonface.openweather.data.local.dao.WeatherForecastDao
 import dagger.Module
 import dagger.Provides
@@ -25,13 +26,19 @@ object LocalDBModule {
             "weather.db"
         ).fallbackToDestructiveMigration().build()
 
+
     @Provides
     @Singleton
-    fun provideFavoritePlacesDao(weatherDb: OpenWeatherDatabase): FavoritePlacesDao = weatherDb.favoritePlacesDao()
+    fun provideCurrentWeatherDao(weatherDb: OpenWeatherDatabase): CurrentWeatherDao = weatherDb.currentWeatherDao()
+
 
     @Provides
     @Singleton
     fun provideWeatherForecastDao(weatherDb: OpenWeatherDatabase): WeatherForecastDao = weatherDb.weatherForecastDao()
+
+    @Provides
+    @Singleton
+    fun provideFavoritePlacesDao(weatherDb: OpenWeatherDatabase): FavoritePlacesDao = weatherDb.favoritePlacesDao()
 
 
 }

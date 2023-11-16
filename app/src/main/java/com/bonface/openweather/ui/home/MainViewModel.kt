@@ -5,24 +5,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
-import com.bonface.openweather.mappers.toCurrentUserLocationEntity
-import com.bonface.openweather.mappers.toOtherLocationEntity
-import com.bonface.openweather.mappers.toWeatherForecastEntity
+import com.bonface.openweather.mappers.toDailyForecastEntity
+import com.bonface.openweather.mappers.toWeatherEntity
 import com.bonface.openweather.repository.WeatherRepository
 import com.bonface.openweather.utils.ErrorHandler
+import com.bonface.openweather.utils.LocationProvider
 import com.bonface.openweather.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val locationProvider: LocationProvider
 ) : ViewModel() {
 
     private val _current = MutableLiveData<Resource<CurrentWeather>>()
@@ -39,26 +40,26 @@ class MainViewModel @Inject constructor(
     val currentLocation: LiveData<Location>
         get() = _currentLocation
 
-    fun getCurrentWeather(location: Location) {
-        _forecast.postValue(Resource.Loading())
+    fun getCurrentWeatherFromRemote(location: Location) {
+        _current.postValue(Resource.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                weatherRepository.getCurrentWeatherByLocation(location).collect{
+                weatherRepository.getCurrentLocationWeather(location).collect{
                     _current.postValue(handleResponse(it))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 val error = ErrorHandler.handleException(e)
-                _forecast.postValue(Resource.Error(error.message.toString()))
+                _current.postValue(Resource.Error(error.message.toString()))
             }
         }
     }
 
-    fun getWeatherForecast(location: Location) {
+    fun getWeatherForecastFromRemote(location: Location) {
         _forecast.postValue(Resource.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                weatherRepository.getWeatherForecastByLocation(location).collect{
+                weatherRepository.getCurrentLocationWeatherForecast(location).collect{
                     _forecast.postValue(handleForecastResponse(it))
                 }
             } catch (e: Exception) {
@@ -69,47 +70,22 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun addToFavoritePlacesCurrentUserLocation(currentWeather: CurrentWeather) {
-        viewModelScope.launch(Dispatchers.IO) {
-            weatherRepository.saveCurrentUserLocation(
-                currentWeather.toCurrentUserLocationEntity()
-            )
+    fun saveCurrentWeatherToDb(currentWeather: CurrentWeather) = viewModelScope.launch(Dispatchers.IO) {
+            weatherRepository.saveCurrentWeather(currentWeather.toWeatherEntity())
         }
-    }
 
-    fun addToFavoritePlacesUserLocation(currentWeather: CurrentWeather) {
-        viewModelScope.launch(Dispatchers.IO) {
-            weatherRepository.saveCurrentUserLocation(
-                currentWeather.toOtherLocationEntity()
-            )
-        }
-    }
-
-    fun saveWeatherForecast(weatherForecast: WeatherForecast, currentLocation: String) =
-        viewModelScope.launch(Dispatchers.IO) {
-            weatherForecast.toWeatherForecastEntity(currentLocation).toMutableList().forEach {
+    fun saveWeatherForecastToDb(weatherForecast: WeatherForecast) = viewModelScope.launch(Dispatchers.IO) {
+            weatherForecast.toDailyForecastEntity().toMutableList().forEach {
                 weatherRepository.saveWeatherForecast(it)
             }
         }
 
-    fun getAllWeatherForecast() = weatherRepository.getAllWeatherForecast()
+    fun getCurrentWeatherFromDb() = weatherRepository.getCurrentWeather()
 
-    fun getFavoritePlaces() = weatherRepository.getAllFavoritePlaces()
+    fun getWeatherForecastFromDb() = weatherRepository.getWeatherForecast()
 
-    fun getCurrentUserLocation() = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.getCurrentUserLocation()
-    }
-
-    fun removeFavoritePlace(favoritePlacesEntity: FavoritePlacesEntity) = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.removeFavoritePlace(favoritePlacesEntity)
-    }
-
-    fun deleteAllPlaces() = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.deleteAllPlaces()
-    }
-
-    fun deleteAllWeatherForecast(favoritePlacesEntity: FavoritePlacesEntity) = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.deleteAllWeatherForecast()
+    fun deleteWeatherForecast() = viewModelScope.launch(Dispatchers.IO) {
+        weatherRepository.deleteWeatherForecast()
     }
 
     fun deleteWeatherForecast(location: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -132,6 +108,13 @@ class MainViewModel @Inject constructor(
             }
         }
         return Resource.Error(message = response.message())
+    }
+
+    fun getCurrentLocation() = viewModelScope.launch(Dispatchers.IO) {
+        locationProvider.getLocation().collect { location ->
+            _currentLocation.postValue(location)
+            cancel("Location is $location")
+        }
     }
 
 
