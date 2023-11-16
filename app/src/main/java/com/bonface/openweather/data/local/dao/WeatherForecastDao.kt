@@ -1,28 +1,30 @@
 package com.bonface.openweather.data.local.dao
 
-import androidx.room.*
-import androidx.room.OnConflictStrategy.Companion.REPLACE
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.bonface.openweather.data.local.TABLE_WEATHER_FORECAST
-import com.bonface.openweather.data.local.entity.WeatherForeCastEntity
+import com.bonface.openweather.data.local.entity.ForecastEntity
+import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WeatherForecastDao {
 
     @Query("SELECT * FROM $TABLE_WEATHER_FORECAST")
-    fun getForecastList(): Flow<List<WeatherForeCastEntity>>
+    fun getWeatherWeather(): Flow<List<ForecastEntity>>
 
-    @Insert(onConflict = REPLACE)
-    fun insertWeatherForecast(forecast: WeatherForeCastEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveWeatherWeather(forecast: ForecastEntity)
 
-    @Query("DELETE FROM $TABLE_WEATHER_FORECAST where location LIKE :location")
+    @Query("DELETE FROM $TABLE_WEATHER_FORECAST where latitude LIKE :location")
     suspend fun deleteWeatherForecast(location: String)
 
     @Query("DELETE FROM $TABLE_WEATHER_FORECAST")
-    suspend fun deleteAll()
+    suspend fun deleteAllForecast()
 
     @Query("SELECT COUNT(*) FROM $TABLE_WEATHER_FORECAST")
     fun getCount(): Int
-
 
 }

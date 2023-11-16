@@ -9,7 +9,7 @@ import retrofit2.http.Query
 interface OpenWeatherApi {
 
     @GET("data/2.5/weather")
-    suspend fun getCurrentWeatherByLocation(
+    suspend fun getCurrentLocationWeather(
         @Query("lat") latitude: String,
         @Query("lon") longitude: String,
         @Query("units") units: String,
@@ -17,7 +17,7 @@ interface OpenWeatherApi {
     ): Response<CurrentWeather>
 
     @GET("data/2.5/onecall")
-    suspend fun getWeatherForecastByLocation(
+    suspend fun getCurrentLocationWeatherForecast(
         @Query("lat") latitude: String,
         @Query("lon") longitude: String,
         @Query("units") units: String,

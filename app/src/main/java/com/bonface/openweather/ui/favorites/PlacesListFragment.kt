@@ -56,7 +56,7 @@ class PlacesListFragment : Fragment() {
     }
 
     private fun updateFavoritePlacesUi(data: WeatherForecast?) {
-        placesListAdapter.differ.submitList(data?.daily)
+        //placesListAdapter.differ.submitList(data?.daily)
     }
 
     private fun setupAdapter() {

@@ -1,61 +1,43 @@
 package com.bonface.openweather.mappers
 
-import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
-import com.bonface.openweather.data.local.entity.WeatherForeCastEntity
+import com.bonface.openweather.data.local.entity.ForecastEntity
+import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
 
-fun CurrentWeather.toCurrentUserLocationEntity(): FavoritePlacesEntity = FavoritePlacesEntity(
-        location = name.toString(),
-        latitude = coord?.lat!!,
-        longitude = coord.lon,
-        temperature = main?.temp,
+fun CurrentWeather.toWeatherEntity(): CurrentWeatherEntity = CurrentWeatherEntity(
+        id = id!!,
+        name = name.toString(),
+        latitude = coord?.lat,
+        longitude = coord?.lon,
+        dt = dt,
+        temp = main?.temp,
         maxTemp = main?.tempMax,
         minTemp = main?.tempMin,
         weatherId = weather?.firstOrNull()?.id,
         weatherMain = weather?.firstOrNull()?.main.toString(),
         weatherDesc = weather?.firstOrNull()?.description.toString(),
-        isCurrentUserLocation = true,
+        country = sys?.country,
         lastUpdatedAt = System.currentTimeMillis()
     )
 
-
-fun CurrentWeather.toOtherLocationEntity(): FavoritePlacesEntity {
-
-    return FavoritePlacesEntity(
-        location = name.toString(),
-        latitude = coord?.lat!!,
-        longitude = coord.lon,
-        temperature = main?.temp,
-        maxTemp = main?.tempMax,
-        minTemp = main?.tempMin,
-        weatherId = weather?.firstOrNull()?.id,
-        weatherMain = weather?.firstOrNull()?.main.toString(),
-        weatherDesc = weather?.firstOrNull()?.description.toString(),
-        isCurrentUserLocation = false,
-        lastUpdatedAt = System.currentTimeMillis()
-    )
-}
-
-
-fun WeatherForecast.toWeatherForecastEntity(location: String): List<WeatherForeCastEntity> {
-    val weatherForecast: MutableList<WeatherForeCastEntity> = ArrayList()
+fun WeatherForecast.toDailyForecastEntity(): List<ForecastEntity> {
+    val weatherForecast: MutableList<ForecastEntity> = ArrayList()
     daily?.forEach {
-        val foreCastEntity = WeatherForeCastEntity(
-            day = it.dt,
-            location = location,
-            latitude = lat!!,
+        val dailyForecastEntity = ForecastEntity(
+            dayOfWeek = it.dt,
+            latitude = lat,
             longitude = lon,
-            temperature = it.temp?.eve,
             maxTemp = it.temp?.max,
             minTemp = it.temp?.min,
+            eveTemp = it.temp?.eve,
+            nightTemp = it.temp?.night,
+            dayTemp = it.temp?.day,
             weatherId = it.weather?.firstOrNull()?.id,
             weatherMain = it.weather?.firstOrNull()?.main,
-            weatherDesc = it.weather?.firstOrNull()?.description,
-            lastUpdatedAt = it.dt
+            weatherDesc = it.weather?.firstOrNull()?.description
         )
-        weatherForecast.add(foreCastEntity)
+        weatherForecast.add(dailyForecastEntity)
     }
-
-    return weatherForecast
+    return weatherForecast.toMutableList()
 }

@@ -5,7 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.data.model.DailyForecast
+import com.bonface.openweather.data.model.WeatherForecast
 import com.bonface.openweather.databinding.ItemFavoritePlacesBinding
 import com.bonface.openweather.databinding.ItemWeatherForecastBinding
 import com.bonface.openweather.ui.home.ForecastAdapter
@@ -15,11 +17,11 @@ class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListA
 
     inner class ViewHolder(val binding: ItemFavoritePlacesBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val diffUtil = object : DiffUtil.ItemCallback<DailyForecast>() {
-        override fun areItemsTheSame(oldList: DailyForecast, newList: DailyForecast): Boolean {
-            return oldList.dt == newList.dt
+    private val diffUtil = object : DiffUtil.ItemCallback<ForecastEntity>() {
+        override fun areItemsTheSame(oldList: ForecastEntity, newList: ForecastEntity): Boolean {
+            return oldList.latitude == newList.latitude
         }
-        override fun areContentsTheSame(oldList: DailyForecast, newList: DailyForecast): Boolean {
+        override fun areContentsTheSame(oldList: ForecastEntity, newList: ForecastEntity): Boolean {
             return oldList == newList
         }
     }
@@ -35,8 +37,8 @@ class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListA
         val forecast = differ.currentList[position]
         with(holder.binding) {
             location.text = forecast.getDay()
-            locationTemp.text = forecast.temp?.getTemperature()
-            locationWeather.text = forecast.temp?.getTemperature()
+            locationTemp.text = forecast.getTemperature()
+            locationWeather.text = forecast.weatherMain
         }
     }
 

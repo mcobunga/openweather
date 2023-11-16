@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bonface.openweather.data.model.DailyForecast
+import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.databinding.ItemWeatherForecastBinding
 import javax.inject.Inject
 
@@ -13,11 +13,11 @@ class ForecastAdapter @Inject constructor() : RecyclerView.Adapter<ForecastAdapt
 
     inner class ViewHolder(val binding: ItemWeatherForecastBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val diffUtil = object : DiffUtil.ItemCallback<DailyForecast>() {
-        override fun areItemsTheSame(oldList: DailyForecast, newList: DailyForecast): Boolean {
-            return oldList.dt == newList.dt
+    private val diffUtil = object : DiffUtil.ItemCallback<ForecastEntity>() {
+        override fun areItemsTheSame(oldList: ForecastEntity, newList: ForecastEntity): Boolean {
+            return oldList.latitude == newList.latitude
         }
-        override fun areContentsTheSame(oldList: DailyForecast, newList: DailyForecast): Boolean {
+        override fun areContentsTheSame(oldList: ForecastEntity, newList: ForecastEntity): Boolean {
             return oldList == newList
         }
     }
@@ -33,9 +33,8 @@ class ForecastAdapter @Inject constructor() : RecyclerView.Adapter<ForecastAdapt
         val forecast = differ.currentList[position]
         holder.binding.apply {
             day.text = forecast.getDay()
-            forecast.weather?.firstOrNull()?.getForecastWeatherIcon()
-                ?.let { weather.setImageResource(it) }
-            temperature.text = forecast.temp?.getTemperature()
+            forecast.getForecastWeatherIcon().let { weather.setImageResource(it) }
+            temperature.text = forecast.getTemperature()
         }
     }
 

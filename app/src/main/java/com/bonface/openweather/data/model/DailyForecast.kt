@@ -36,29 +36,4 @@ data class DailyForecast(
     @Json(name="weather") val weather: List<Weather>? = null,
     @Json(name="humidity") val humidity: Int? = null,
     @Json(name="wind_speed") val windSpeed: Double? = null
-) : Parcelable {
-
-    @SuppressLint("NewApi")
-    fun getDay(): String? {
-        return dt.let { dt ->
-            dt?.let { getDateTime(it)?.getDisplayName(TextStyle.FULL, Locale.ENGLISH) }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun getDateTime(s: Long): DayOfWeek? {
-        return try {
-            val newDate = Date(s * 1000)
-            val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH).format(newDate)
-            LocalDate.of(
-                formattedDate.substringAfterLast("/").toInt(),
-                formattedDate.substringAfter("/").take(2).toInt(),
-                formattedDate.substringBefore("/").toInt()
-            ).dayOfWeek
-        } catch (e: Exception) {
-            e.printStackTrace()
-            DayOfWeek.MONDAY
-        }
-    }
-
-}
+) : Parcelable

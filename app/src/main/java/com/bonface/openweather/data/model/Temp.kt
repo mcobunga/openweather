@@ -14,16 +14,4 @@ data class Temp(
     @Json(name="night") val night: Double? = null,
     @Json(name="day") val day: Double? = null,
     @Json(name="morn") val morn: Double? = null
-) : Parcelable {
-    fun getTemperature(): String {
-        return "$day°"
-    }
-
-    fun getMinTemperature(): String {
-        return "$min°"
-    }
-
-    fun getMaxTemperature(): String {
-        return "$max°"
-    }
-}
+) : Parcelable
