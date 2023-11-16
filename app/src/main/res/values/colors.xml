@@ -11,4 +11,7 @@
     <color name="colorCloudy">#57717A</color>
     <color name="colorRainy">#57575D</color>
     <color name="overlay">#C2000000</color>
+    <color name="current_location_marker">#F44336</color>
+    <color name="favorite_places_marker">#FFBB86FC</color>
+    <color name="black">#151515</color>
 </resources>

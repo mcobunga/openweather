@@ -183,20 +183,6 @@
         tools:itemCount="5"
         tools:listitem="@layout/item_weather_forecast" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/favorite_places"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/outline_star_outline_24"
-        app:backgroundTint="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/colorPrimary"
-        tools:ignore="SpeakableTextPresentCheck"
-        android:contentDescription="@string/weather_icon_desc" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/loading_layout"
         android:layout_width="match_parent"
@@ -216,5 +202,73 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:icon="@drawable/baseline_add_24"
+        app:backgroundTint="@color/white"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:fabSize="mini"
+        android:src="@drawable/baseline_add_location_24"
+        app:backgroundTint="@color/white"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/fab"
+        app:layout_constraintEnd_toEndOf="@+id/fab"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/add_fav_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/add_to_favorites"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/add_favorite"
+        app:layout_constraintEnd_toStartOf="@+id/add_favorite"
+        app:layout_constraintTop_toTopOf="@+id/add_favorite"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/favorite_places"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:fabSize="mini"
+        android:src="@drawable/outline_star_outline_24"
+        app:backgroundTint="@color/white"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/add_favorite"
+        app:layout_constraintEnd_toEndOf="@+id/add_favorite"
+        app:layout_constraintStart_toStartOf="@+id/add_favorite"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/favorites_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/favorites"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/favorite_places"
+        app:layout_constraintEnd_toStartOf="@+id/favorite_places"
+        app:layout_constraintTop_toTopOf="@+id/favorite_places"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

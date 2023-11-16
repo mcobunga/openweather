@@ -1,17 +1,10 @@
 package com.bonface.openweather.ui.home
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +24,6 @@ import com.bonface.openweather.utils.PermissionUtils.showEnableGPSDialog
 import com.bonface.openweather.utils.Resource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
+    private var isAllFabsVisible: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupUI()
+        setFloatingButtonController()
         checkForLocationPermission()
         getUserLocationWeatherInfo()
     }
@@ -91,12 +85,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun getUserLocationWeatherInfo() {
         if (location?.latitude != null && location?.longitude != null) {
-            getUserLocationCurrentWeather()
-            getUserLocationWeatherForecast()
+            getUserLocationCurrentWeather(location!!)
+            getUserLocationWeatherForecast(location!!)
         }
     }
 
-    private fun getUserLocationCurrentWeather() {
+    private fun getUserLocationCurrentWeather(location: Location) {
         mainViewModel.currentWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -112,9 +106,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        mainViewModel.getCurrentWeather(location)
     }
 
-    private fun getUserLocationWeatherForecast() {
+    private fun getUserLocationWeatherForecast(location: Location) {
         mainViewModel.forecastWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -130,6 +125,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        mainViewModel.getWeatherForecast(location)
     }
 
     private fun updateCurrentWeatherViews(current: CurrentWeather?) {
@@ -147,6 +143,10 @@ class MainActivity : AppCompatActivity() {
             currentTemperatureValue.text = current?.main?.getTemperature()
             maxTemperatureValue.text = current?.main?.getMaxTemperature()
             current?.getCurrentWeatherImage()?.let { updateStatusBarColor(it) }
+
+            addFavorite.setOnClickListener {
+                current?.let { location -> mainViewModel.addToFavoritePlacesCurrentUserLocation(location) }
+            }
         }
     }
 
@@ -181,8 +181,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshWeatherData() {
-        mainViewModel.getCurrentWeather()
-        mainViewModel.getWeatherForecast()
+        if (location != null) {
+            mainViewModel.getCurrentWeather(location!!)
+            mainViewModel.getWeatherForecast(location!!)
+        }
     }
 
     private fun updateStatusBarColor(resource: Int) {
@@ -196,6 +198,37 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun setFloatingButtonController() {
+        isAllFabsVisible = false
+        with(binding) {
+            fab.shrink()
+            fab.setOnClickListener {
+                isAllFabsVisible = if (!isAllFabsVisible!!) {
+                    favoritePlaces.show()
+                    addFavorite.show()
+                    favoritesActionText.visibility = View.VISIBLE
+                    addFavActionText.visibility = View.VISIBLE
+                    fab.extend()
+                    true
+                } else {
+                    favoritePlaces.hide()
+                    addFavorite.hide()
+                    favoritesActionText.visibility = View.GONE
+                    addFavActionText.visibility = View.GONE
+                    fab.shrink()
+                    false
+                }
+            }
+            favoritePlaces.setOnClickListener {
+                goToFavoritePlaces()
+            }
+        }
+    }
+
+    private fun goToFavoritePlaces() {
+
     }
 
 }

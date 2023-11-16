@@ -4,37 +4,28 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.bonface.openweather.data.local.dao.Converters
-import com.bonface.openweather.data.local.dao.CurrentWeatherDao
+import com.bonface.openweather.data.local.dao.FavoritePlacesDao
 import com.bonface.openweather.data.local.dao.WeatherForecastDao
-import com.bonface.openweather.data.local.entity.CityEntity
-import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
-import com.bonface.openweather.data.local.entity.WeatherForecastEntity
+import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
+import com.bonface.openweather.data.local.entity.WeatherForeCastEntity
 
-const val TABLE_CURRENT_WEATHER = "weather_current"
-const val TABLE_FORECAST_WEATHER = "DetailedTransaction"
 const val TABLE_FAVORITE_PLACES = "favorite_places"
-const val TABLE_CITY = "city"
+const val TABLE_WEATHER_FORECAST = "weather_forecast"
 
 @Database(
     entities = [
-        CurrentWeatherEntity::class,
-        WeatherForecastEntity::class,
-        CityEntity::class
+        WeatherForeCastEntity::class,
+        FavoritePlacesEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 
-@TypeConverters(Converters::class)
 abstract class OpenWeatherDatabase : RoomDatabase() {
-
-    abstract fun currentWeatherDao(): CurrentWeatherDao
 
     abstract fun weatherForecastDao(): WeatherForecastDao
 
-    //abstract fun favoriteLocationsDao(): FavoriteLocationsDao
+    abstract fun favoritePlacesDao(): FavoritePlacesDao
 
     companion object {
         private var instance: OpenWeatherDatabase? = null
