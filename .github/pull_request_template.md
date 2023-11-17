@@ -15,10 +15,9 @@
 ## Checklist
 
 ### Submitter
-- [ ] I have updated / included Unit tests.
-- [ ] I have updated / included UI tests.
+- [ ] I have updated/included Unit tests.
+- [ ] I have updated/included UI tests.
 - [ ] I have run the app on a local device (Emulator / Physical).
-- [ ] I have checked the code changes on other apps (Yoyo Wallet/Caffe Nero/Yoyo Go/Other RBAs)
 - [ ] I have updated the documentation.
 
 ### Reviewer
