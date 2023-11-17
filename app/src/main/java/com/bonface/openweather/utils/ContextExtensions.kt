@@ -1,14 +1,12 @@
 package com.bonface.openweather.utils
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.location.Location
 import android.location.LocationManager
 import android.os.SystemClock
 import android.provider.Settings
@@ -23,7 +21,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import com.bonface.openweather.R
-import com.bonface.openweather.utils.Constants.PERMISSION_REQUEST_CODE
 
 fun Context.isLocationEnabled(): Boolean {
     val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager

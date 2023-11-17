@@ -1,15 +1,16 @@
 package com.bonface.openweather.di
 
+import android.content.Context
 import android.os.Environment
 import com.bonface.openweather.BuildConfig
+import com.bonface.openweather.R
 import com.bonface.openweather.data.remote.OpenWeatherApi
-import com.bonface.openweather.utils.Constants.API_KEY
-import com.bonface.openweather.utils.Constants.BASE_URL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -52,7 +53,7 @@ object NetworkModule {
     @Provides
     @OpenWeatherApiKey
     @Singleton
-    fun provideApiKey(): String = API_KEY
+    fun provideOpenWeatherApiKey(@ApplicationContext context: Context): String = context.getString(R.string.open_weather_api_key)
 
     @Provides
     @Singleton
@@ -63,7 +64,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(BuildConfig.BASE_URL)
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .client(okHttpClient)
         .build()
