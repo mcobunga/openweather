@@ -14,17 +14,17 @@ import com.bonface.openweather.repository.WeatherRepository
 import com.bonface.openweather.utils.ErrorHandler
 import com.bonface.openweather.utils.LocationProvider
 import com.bonface.openweather.utils.Resource
+import com.bonface.openweather.utils.roundOffDecimal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class WeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val locationProvider: LocationProvider
 ) : ViewModel() {
@@ -118,9 +118,13 @@ class MainViewModel @Inject constructor(
         weatherRepository.deleteAllLocations()
     }
 
-    fun isLocationAlreadyExists(location: Location) = flow<Boolean> {
-        weatherRepository.isLocationAlreadyExists(location.latitude, location.longitude).collect{
-            _isExists.value = it
+    fun isLocationAlreadyExists(location: Location) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            weatherRepository.isLocationAlreadyExists(roundOffDecimal(location.latitude), roundOffDecimal(location.longitude)).apply {
+                _isExists.postValue(this)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

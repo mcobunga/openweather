@@ -1,4 +1,4 @@
-package com.bonface.openweather.ui.favorites
+package com.bonface.openweather.ui.favorites.adapter
 
 import android.location.Location
 import android.view.LayoutInflater
@@ -8,16 +8,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
-import com.bonface.openweather.data.local.entity.ForecastEntity
-import com.bonface.openweather.data.model.DailyForecast
-import com.bonface.openweather.data.model.WeatherForecast
 import com.bonface.openweather.databinding.ItemFavoritePlacesBinding
-import com.bonface.openweather.databinding.ItemWeatherForecastBinding
-import com.bonface.openweather.ui.home.ForecastAdapter
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.roundOffDecimal
 import com.bonface.openweather.utils.show
-import timber.log.Timber
 import javax.inject.Inject
 
 class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListAdapter.ViewHolder>() {
@@ -34,7 +28,6 @@ class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListA
     }
 
     val differ = AsyncListDiffer(this, diffUtil)
-    var currentUserLocation: Location? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemFavoritePlacesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -48,7 +41,7 @@ class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListA
             locationTemp.text = place.getTemperature()
             locationWeather.text = place.weatherMain
             lastUpdatedAt.text = place.lastUpdated()
-            if (currentUserLocation != null && (roundOffDecimal(currentUserLocation!!.latitude) == place.latitude && roundOffDecimal(currentUserLocation!!.longitude) == place.longitude)) {
+            if (place.isCurrentLocation == true ) {
                 currentLocation.show()
                 lastUpdatedAt.gone()
             } else {

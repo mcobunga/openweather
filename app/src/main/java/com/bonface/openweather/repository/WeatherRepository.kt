@@ -73,14 +73,13 @@ class WeatherRepository @Inject constructor(
     suspend fun deleteWeatherForecast(location: String) = weatherForecastDao.deleteWeatherForecast(location)
 
 
-
     fun getFavoritePlaces() = favoriteLocationDao.getFavoritePlaces()
 
     suspend fun saveFavoritePlace(favoritePlacesEntity: FavoritePlacesEntity) = favoriteLocationDao.saveFavoritePlace(favoritePlacesEntity)
 
     suspend fun deleteAllLocations() = favoriteLocationDao.deleteAllPlaces()
 
-    suspend fun isLocationAlreadyExists(latitude: Double, longitude: Double) = favoriteLocationDao.isLocationAlreadyExists(latitude, longitude)
+    fun isLocationAlreadyExists(latitude: Double, longitude: Double) = favoriteLocationDao.isLocationAlreadyExists(latitude, longitude)
 
 
 }

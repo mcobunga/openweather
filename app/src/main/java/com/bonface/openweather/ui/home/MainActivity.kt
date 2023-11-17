@@ -7,6 +7,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -19,6 +20,7 @@ import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.databinding.ActivityMainBinding
 import com.bonface.openweather.ui.favorites.FavoritePlacesActivity
+import com.bonface.openweather.ui.search.PlacesSearchActivity
 import com.bonface.openweather.utils.Resource
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
@@ -45,8 +47,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var forecastAdapter: ForecastAdapter
     private var location: Location? = null
 
-    private val viewModel: SplashViewModel by viewModels()
-    private val mainViewModel: MainViewModel by viewModels()
+    private val splashViewModel: SplashViewModel by viewModels()
+    private val weatherViewModel: WeatherViewModel by viewModels()
     private var isAllFabsVisible: Boolean? = false
     private var isWeatherInfoLoaded: Boolean? = false
 
@@ -54,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                viewModel.loading.value
+                splashViewModel.loading.value
             }
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -69,6 +71,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         isAllFabsVisible = false
+    }
+
+    override fun onStop() {
+        super.onStop()
+        location = null
     }
 
     private fun setupUI() {
@@ -96,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         when {
             isAccessFineLocationGranted() -> {
                 when {
-                    isLocationEnabled() -> mainViewModel.getCurrentLocation()
+                    isLocationEnabled() -> weatherViewModel.getCurrentLocation()
                     else -> showEnableGPSDialog()
                 }
             }
@@ -106,7 +113,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setLocationObserver() {
-        mainViewModel.currentLocation.observe(this@MainActivity) {
+        weatherViewModel.currentLocation.observe(this@MainActivity) {
             location = it
             it?.let { location ->
                 getCurrentWeatherFromRemote(location)
@@ -118,7 +125,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getCachedWeatherInfo() {
         lifecycleScope.launchWhenStarted {
-            mainViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
+            weatherViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
                 if (currentWeather.isNotEmpty()) {
                     isWeatherInfoLoaded = true
                     updateWeatherViews(currentWeather)
@@ -127,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launchWhenStarted {
-            mainViewModel.getWeatherForecastFromDb().collect { dailyForecast ->
+            weatherViewModel.getWeatherForecastFromDb().collect { dailyForecast ->
                 if (dailyForecast.isNotEmpty()) {
                     forecastAdapter.differ.submitList(dailyForecast.take(5))
                 }
@@ -136,11 +143,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrentWeatherFromRemote(location: Location) {
-        mainViewModel.currentWeather.observe(this) { resource ->
+        weatherViewModel.currentWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     hideLoading()
-                    resource.data?.let { mainViewModel.saveCurrentWeatherToDb(it) }
+                    resource.data?.let { weather ->
+                        weatherViewModel.deleteCurrentWeatherFromDb().invokeOnCompletion {
+                            weatherViewModel.saveCurrentWeatherToDb(weather)
+                        }
+                    }
                     currentWeather = resource.data
                 }
                 is Resource.Error -> {
@@ -152,20 +163,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        mainViewModel.getCurrentWeatherFromRemote(location)
+        weatherViewModel.getCurrentWeatherFromRemote(location)
     }
 
     private fun getWeatherForecastFromRemote(location: Location) {
-        mainViewModel.forecastWeather.observe(this) { resource ->
+        weatherViewModel.forecastWeather.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> resource.data?.let { forecast ->
-                    mainViewModel.saveWeatherForecastToDb(forecast)
+                    weatherViewModel.deleteWeatherForecast().invokeOnCompletion {
+                        weatherViewModel.saveWeatherForecastToDb(forecast)
+                    }
                 }
                 is Resource.Error -> showSnackbarErrorMessage(resource.message.toString())
                 is Resource.Loading ->{} //nothing - applying progressbar to only current weather api call
             }
         }
-        mainViewModel.getWeatherForecastFromRemote(location)
+        weatherViewModel.getWeatherForecastFromRemote(location)
     }
 
     private fun updateWeatherViews(weather: List<CurrentWeatherEntity>) {
@@ -206,8 +219,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshWeatherData() {
         if (location != null) {
-            mainViewModel.getCurrentWeatherFromRemote(location!!)
-            mainViewModel.getWeatherForecastFromRemote(location!!)
+            weatherViewModel.getCurrentWeatherFromRemote(location!!)
+            weatherViewModel.getWeatherForecastFromRemote(location!!)
         } else {
             toast("Enable location permissions")
         }
@@ -256,7 +269,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestAccessFineLocationPermission() {
         Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(object : PermissionListener {
                 override fun onPermissionGranted(ermissionGrantedResponse: PermissionGrantedResponse) {
-                    mainViewModel.getCurrentLocation()
+                    weatherViewModel.getCurrentLocation()
                 }
 
                 override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
@@ -273,12 +286,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveToFavoriteLocations() {
         if (location != null) {
-            mainViewModel.isExists.observe(this) { isExists ->
-                if (!isExists) {
-                    currentWeather?.let { mainViewModel.saveLocationToFavorites(it) }
+            weatherViewModel.isExists.observe(this) {
+                if (!it) {
+                    currentWeather?.let { weatherViewModel.saveLocationToFavorites(it) }
                     toast("Successfully added to favorites")
                 } else toast("Already exists in your favorites")
             }
+            weatherViewModel.isLocationAlreadyExists(location!!)
         }
     }
 
@@ -287,7 +301,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToSearch() {
-        startActivity { Intent(this, FavoritePlacesActivity::class.java) }
+        startActivity { Intent(this, PlacesSearchActivity::class.java) }
     }
 
     private fun showLoading() {

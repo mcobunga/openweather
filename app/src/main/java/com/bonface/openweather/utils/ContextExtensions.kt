@@ -115,31 +115,3 @@ fun Context.showEnableGPSDialog() {
         }
         .show()
 }
-
-/**
- * Function to get user current location if the location permissions are granted
- */
-fun Context.getUserCurrentLocation(activity: Activity): Location? {
-    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-            PERMISSION_REQUEST_CODE
-        )
-        return null
-    } else {
-        val locationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val gps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        val network = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        var locationTimeGPS: Long = 0
-        if (gps != null) {
-            locationTimeGPS = gps.time
-        }
-        var locationTimeNet: Long = 0
-        if (network != null) {
-            locationTimeNet = network.time
-        }
-        return if (locationTimeGPS > locationTimeNet) gps else network
-    }
-}

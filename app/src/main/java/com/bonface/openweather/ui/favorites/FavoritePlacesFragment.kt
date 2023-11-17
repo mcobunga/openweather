@@ -10,14 +10,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.databinding.FragmentFavoritePlacesBinding
-import com.bonface.openweather.ui.home.MainViewModel
+import com.bonface.openweather.ui.favorites.adapter.PlacesListAdapter
+import com.bonface.openweather.ui.home.WeatherViewModel
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
+import com.bonface.openweather.utils.roundOffDecimal
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Collections
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class FavoritePlacesFragment : Fragment() {
@@ -27,7 +31,7 @@ class FavoritePlacesFragment : Fragment() {
 
     @Inject
     lateinit var placesListAdapter: PlacesListAdapter
-    private val mainViewModel: MainViewModel by viewModels()
+    private val weatherViewModel: WeatherViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater,container: ViewGroup?,savedInstanceState: Bundle?): View {
         _binding = FragmentFavoritePlacesBinding.inflate(inflater, container, false)
@@ -46,7 +50,7 @@ class FavoritePlacesFragment : Fragment() {
                 when {
                     requireContext().isLocationEnabled() -> {
                         setLocationObserver()
-                        mainViewModel.getCurrentLocation() //Will check fetched locations if any matches current location
+                        weatherViewModel.getCurrentLocation() //Will check fetched locations if any matches current location
                     }
                     else -> getFavoritePlaces() //Fetching for places without the need to show current location
                 }
@@ -56,7 +60,7 @@ class FavoritePlacesFragment : Fragment() {
     }
 
     private fun setLocationObserver() {
-        mainViewModel.currentLocation.observe(viewLifecycleOwner) {
+        weatherViewModel.currentLocation.observe(viewLifecycleOwner) {
             getFavoritePlaces(it)
         }
     }
@@ -64,9 +68,18 @@ class FavoritePlacesFragment : Fragment() {
     private fun getFavoritePlaces(location: Location? = null) {
         showLoading()
         lifecycleScope.launchWhenStarted {
-            mainViewModel.getFavoritePlaces().collect { places ->
+            weatherViewModel.getFavoritePlaces().collect { places ->
                 if (places.isNotEmpty()) {
-                    placesListAdapter.currentUserLocation = location
+                    places.forEach {
+                        if (location != null && (roundOffDecimal(location.latitude) == it.latitude && roundOffDecimal(location.longitude) == it.longitude)) {
+                            it.isCurrentLocation = true
+                        }
+                    }
+                    for (i in 0 until places.toMutableList().size) {
+                        if (places[i].isCurrentLocation == true) {
+                            Collections.rotate(places, i)
+                        }
+                    }
                     placesListAdapter.differ.submitList(places)
                     hideLoading()
                 }

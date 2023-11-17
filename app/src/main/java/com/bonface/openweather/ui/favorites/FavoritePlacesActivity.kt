@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bonface.openweather.R
 import com.bonface.openweather.databinding.ActivityFavoritePlacesBinding
-import com.bonface.openweather.databinding.ActivityMainBinding
+import com.bonface.openweather.ui.favorites.adapter.PlacesFragmentAdapter
 import com.bonface.openweather.ui.home.MainActivity
 import com.bonface.openweather.utils.startActivity
 import com.google.android.material.tabs.TabLayoutMediator
