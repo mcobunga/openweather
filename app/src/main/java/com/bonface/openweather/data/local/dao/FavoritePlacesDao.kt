@@ -12,22 +12,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoritePlacesDao {
-    @Query("SELECT * FROM $TABLE_FAVORITE_PLACES ORDER BY is_current DESC")
+    @Query("SELECT * FROM $TABLE_FAVORITE_PLACES")
     fun getFavoritePlaces(): Flow<List<FavoritePlacesEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveFavoritePlace(locationEntity: FavoritePlacesEntity)
-
-    @Query("SELECT * FROM $TABLE_FAVORITE_PLACES WHERE is_current =:current")
-    fun getCurrentWeather(current: Int = 1): Flow<List<FavoritePlacesEntity>>
+    suspend fun saveFavoritePlace(favoritePlacesEntity: FavoritePlacesEntity)
 
     @Delete
-    suspend fun removeLocation(locationEntity: FavoritePlacesEntity)
+    suspend fun removeLocation(favoritePlacesEntity: FavoritePlacesEntity)
 
     @Query("DELETE FROM $TABLE_FAVORITE_PLACES")
-    suspend fun deleteAll()
+    suspend fun deleteAllPlaces()
 
-    @Query("DELETE FROM $TABLE_FAVORITE_PLACES WHERE is_current =:current")
-    fun removeCurrentUserLocation(current: Int = 1)
+    @Query("SELECT EXISTS(SELECT * FROM $TABLE_FAVORITE_PLACES WHERE latitude = :latitude AND longitude = :longitude)")
+    fun isLocationAlreadyExists(latitude: Double, longitude: Double): Flow<Boolean>
 
 }

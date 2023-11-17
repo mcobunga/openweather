@@ -33,10 +33,10 @@ data class ForecastEntity(
     @ColumnInfo(name = "weather_desc") val weatherDesc: String?
 ): Parcelable {
 
-    @SuppressLint("NewApi")
     fun getDay(): String? {
+        val sdf = SimpleDateFormat("EEEE", Locale.getDefault())
         return dayOfWeek.let { dt ->
-            dt?.let { getDateTime(it)?.getDisplayName(TextStyle.FULL, Locale.getDefault()) }
+            dt?.let { sdf.format(Date(it * 1000)) }
         }
     }
 
@@ -76,19 +76,4 @@ data class ForecastEntity(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun getDateTime(s: Long): DayOfWeek? {
-        return try {
-            val newDate = Date(s * 1000)
-            val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH).format(newDate)
-            LocalDate.of(
-                formattedDate.substringAfterLast("/").toInt(),
-                formattedDate.substringAfter("/").take(2).toInt(),
-                formattedDate.substringBefore("/").toInt()
-            ).dayOfWeek
-        } catch (e: Exception) {
-            e.printStackTrace()
-            DayOfWeek.MONDAY
-        }
-    }
 }

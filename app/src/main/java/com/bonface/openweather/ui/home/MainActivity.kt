@@ -1,6 +1,7 @@
 package com.bonface.openweather.ui.home
 
 import android.Manifest
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
@@ -16,14 +17,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.model.CurrentWeather
-import com.bonface.openweather.data.model.WeatherForecast
 import com.bonface.openweather.databinding.ActivityMainBinding
+import com.bonface.openweather.ui.favorites.FavoritePlacesActivity
 import com.bonface.openweather.utils.Resource
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.showEnableGPSDialog
+import com.bonface.openweather.utils.startActivity
 import com.bonface.openweather.utils.toast
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
@@ -45,7 +47,8 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
-    private var isAllFabsVisible: Boolean? = null
+    private var isAllFabsVisible: Boolean? = false
+    private var isWeatherInfoLoaded: Boolean? = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +66,11 @@ class MainActivity : AppCompatActivity() {
         getCachedWeatherInfo()
     }
 
+    override fun onResume() {
+        super.onResume()
+        isAllFabsVisible = false
+    }
+
     private fun setupUI() {
         with(binding) {
             weatherForecast.apply {
@@ -73,10 +81,13 @@ class MainActivity : AppCompatActivity() {
                 refreshWeatherData()
             }
             favoritePlaces.setOnClickListener {
-
+                goToFavorites()
+            }
+            searchPlaces.setOnClickListener {
+                goToSearch()
             }
             addFavorite.setOnClickListener {
-
+                saveToFavoriteLocations()
             }
         }
     }
@@ -109,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenStarted {
             mainViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
                 if (currentWeather.isNotEmpty()) {
+                    isWeatherInfoLoaded = true
                     updateWeatherViews(currentWeather)
                 }
             }
@@ -129,6 +141,7 @@ class MainActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     hideLoading()
                     resource.data?.let { mainViewModel.saveCurrentWeatherToDb(it) }
+                    currentWeather = resource.data
                 }
                 is Resource.Error -> {
                     hideLoading()
@@ -145,7 +158,9 @@ class MainActivity : AppCompatActivity() {
     private fun getWeatherForecastFromRemote(location: Location) {
         mainViewModel.forecastWeather.observe(this) { resource ->
             when (resource) {
-                is Resource.Success -> resource.data?.let { mainViewModel.saveWeatherForecastToDb(it) }
+                is Resource.Success -> resource.data?.let { forecast ->
+                    mainViewModel.saveWeatherForecastToDb(forecast)
+                }
                 is Resource.Error -> showSnackbarErrorMessage(resource.message.toString())
                 is Resource.Loading ->{} //nothing - applying progressbar to only current weather api call
             }
@@ -175,14 +190,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showLoading() {
-        binding.loadingLayout.show()
-    }
-
-    private fun hideLoading() {
-        binding.loadingLayout.gone()
-    }
-
     private fun showSnackbarErrorMessage(message: String) {
         binding.weatherLayout.apply {
             val snack = Snackbar.make(this, message, Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.try_again)) {
@@ -201,6 +208,8 @@ class MainActivity : AppCompatActivity() {
         if (location != null) {
             mainViewModel.getCurrentWeatherFromRemote(location!!)
             mainViewModel.getWeatherForecastFromRemote(location!!)
+        } else {
+            toast("Enable location permissions")
         }
     }
 
@@ -218,28 +227,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setFloatingButtonController() {
-        isAllFabsVisible = false
         with(binding) {
             fab.shrink()
             fab.setOnClickListener {
                 isAllFabsVisible = if (!isAllFabsVisible!!) {
                     favoritePlaces.show()
-                    addFavorite.show()
+                    if (isWeatherInfoLoaded == true) addFavorite.show() else addFavorite.hide()
+                    if (isWeatherInfoLoaded == true) addFavActionText.show() else addFavActionText.gone()
+                    searchPlaces.show()
                     favoritesActionText.show()
-                    addFavActionText.show()
+                    searchActionText.show()
                     fab.extend()
                     true
                 } else {
                     favoritePlaces.hide()
                     addFavorite.hide()
+                    searchPlaces.hide()
                     favoritesActionText.gone()
                     addFavActionText.gone()
+                    searchActionText.gone()
                     fab.shrink()
                     false
                 }
-            }
-            favoritePlaces.setOnClickListener {
-
             }
         }
     }
@@ -260,6 +269,37 @@ class MainActivity : AppCompatActivity() {
                 }
 
         }).check()
+    }
+
+    private fun saveToFavoriteLocations() {
+        if (location != null) {
+            mainViewModel.isExists.observe(this) { isExists ->
+                if (!isExists) {
+                    currentWeather?.let { mainViewModel.saveLocationToFavorites(it) }
+                    toast("Successfully added to favorites")
+                } else toast("Already exists in your favorites")
+            }
+        }
+    }
+
+    private fun goToFavorites() {
+        startActivity { Intent(this, FavoritePlacesActivity::class.java) }
+    }
+
+    private fun goToSearch() {
+        startActivity { Intent(this, FavoritePlacesActivity::class.java) }
+    }
+
+    private fun showLoading() {
+        binding.loadingLayout.show()
+    }
+
+    private fun hideLoading() {
+        binding.loadingLayout.gone()
+    }
+
+    companion object {
+        private var currentWeather: CurrentWeather? = null
     }
 
 }

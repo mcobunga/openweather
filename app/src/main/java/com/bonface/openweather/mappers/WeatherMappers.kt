@@ -1,7 +1,10 @@
 package com.bonface.openweather.mappers
 
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
+import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
 
@@ -41,3 +44,19 @@ fun WeatherForecast.toDailyForecastEntity(): List<ForecastEntity> {
     }
     return weatherForecast.toMutableList()
 }
+
+
+fun CurrentWeather.toFavoritePlacesEntity(): FavoritePlacesEntity =  FavoritePlacesEntity(
+    id = id!!,
+    location = name,
+    latitude = coord?.lat,
+    longitude = coord?.lon,
+    temp = main?.temp,
+    maxTemp = main?.tempMax,
+    minTemp = main?.tempMin,
+    weatherId = weather?.firstOrNull()?.id,
+    weatherMain = weather?.firstOrNull()?.main.toString(),
+    weatherDesc = weather?.firstOrNull()?.description.toString(),
+    country = sys?.country,
+    lastUpdatedAt = System.currentTimeMillis()
+)

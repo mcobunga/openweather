@@ -8,6 +8,7 @@ import com.bonface.openweather.R
 import com.bonface.openweather.data.local.TABLE_CURRENT_WEATHER
 import com.bonface.openweather.data.local.TABLE_WEATHER_FORECAST
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,11 +30,11 @@ data class CurrentWeatherEntity(
     @ColumnInfo(name = "country") val country: String?,
     @ColumnInfo(name = "last_updated_at") val lastUpdatedAt: Long
 ) : Parcelable {
+
     fun lastUpdated(): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
         return run {
-            val netDate = Date(lastUpdatedAt * 1000)
-            sdf.format(netDate)
+            sdf.format(Date(lastUpdatedAt))
         }
     }
 
