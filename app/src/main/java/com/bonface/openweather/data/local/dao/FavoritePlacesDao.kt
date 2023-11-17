@@ -24,7 +24,7 @@ interface FavoritePlacesDao {
     @Query("DELETE FROM $TABLE_FAVORITE_PLACES")
     suspend fun deleteAllPlaces()
 
-    @Query("SELECT EXISTS(SELECT * FROM $TABLE_FAVORITE_PLACES WHERE latitude = :latitude AND longitude = :longitude)")
-    fun isLocationAlreadyExists(latitude: Double, longitude: Double): Flow<Boolean>
+    @Query("SELECT EXISTS (SELECT 1 FROM $TABLE_FAVORITE_PLACES WHERE latitude = :latitude AND longitude = :longitude)")
+    fun isLocationAlreadyExists(latitude: Double, longitude: Double): Boolean
 
 }

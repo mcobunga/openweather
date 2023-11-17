@@ -14,4 +14,5 @@
     <color name="current_location_marker">#F44336</color>
     <color name="favorite_places_marker">#FFBB86FC</color>
     <color name="black">#151515</color>
+    <color name="grey">#999999</color>
 </resources>

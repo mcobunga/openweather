@@ -25,6 +25,7 @@ data class FavoritePlacesEntity(
     @ColumnInfo(name = "weather_main") val weatherMain: String?,
     @ColumnInfo(name = "weather_desc") val weatherDesc: String?,
     @ColumnInfo(name = "country") val country: String?,
+    @ColumnInfo(name = "current_loc") var isCurrentLocation: Boolean? = false,
     @ColumnInfo(name = "last_updated_at") val lastUpdatedAt: Long,
 ) : Parcelable {
     fun lastUpdated(): String {

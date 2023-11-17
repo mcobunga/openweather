@@ -1,5 +1,6 @@
 package com.bonface.openweather.ui.favorites
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Address
 import android.location.Geocoder
@@ -9,35 +10,43 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.bonface.openweather.R
+import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.databinding.FragmentFavoritesMapsBinding
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.Priority
+import com.bonface.openweather.ui.home.WeatherViewModel
+import com.bonface.openweather.utils.bitmapDescriptorFromVector
+import com.bonface.openweather.utils.isAccessFineLocationGranted
+import com.bonface.openweather.utils.isLocationEnabled
+import com.bonface.openweather.utils.showEnableGPSDialog
+import com.bonface.openweather.utils.toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.IOException
 
 @AndroidEntryPoint
-class FavoritesMapsFragment : Fragment() {
+class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private var _binding: FragmentFavoritesMapsBinding? = null
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var lastLocation: Location
-    private lateinit var locationCallback: LocationCallback
-    private lateinit var locationRequest: LocationRequest
-    private var locationUpdateState = false
+    private val weatherViewModel: WeatherViewModel by viewModels()
     private lateinit var mapFragment: SupportMapFragment
-    private var googleMap: GoogleMap? = null
+    private var locationsMap: GoogleMap? = null
+    private var currentLocation: Location? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater,container: ViewGroup?,savedInstanceState: Bundle?): View {
@@ -48,90 +57,84 @@ class FavoritesMapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeMap()
-
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-//        locationCallback = object : LocationCallback() {
-//            override fun onLocationResult(p0: LocationResult) {
-//                super.onLocationResult(p0)
-//                lastLocation = p0.lastLocation!!
-//                favoriteLocations.add(LatLng(lastLocation.latitude, lastLocation.longitude))
-//            }
-//        }
-//        createLocationRequest()
-//        if (isLocationEnabled(requireContext())){
-//            locationUpdateState = true
-//            startLocationUpdates()
-//        }
-
+        setLocationObserver()
     }
-
 
     private fun initializeMap() {
-//        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-//        mapFragment.getMapAsync(this)
+        mapFragment = childFragmentManager.findFragmentById(R.id.places_map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
-    override fun onPause() {
-        super.onPause()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+    override fun onMapReady(googleMap: GoogleMap) {
+        locationsMap = googleMap
+        locationsMap?.uiSettings?.isZoomControlsEnabled = true
+        locationsMap?.setOnMarkerClickListener(this)
+        checkLocationPermission()
     }
 
-    public override fun onResume() {
-        super.onResume()
-        if (!locationUpdateState) {
-            startLocationUpdates()
+    @SuppressLint("MissingPermission")
+    private fun setLocationObserver() {
+        weatherViewModel.currentLocation.observe(viewLifecycleOwner) {
+            currentLocation = it
+            locationsMap?.isMyLocationEnabled = true
+            locationsMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+            getFavoritePlaces(it)
         }
     }
 
-    /**
-     * This callback is triggered when the map is ready to be used.
-     */
-//    override fun onMapReady(googleMap: GoogleMap) {
-//        googleMap = googleMap
-//        googleMap.uiSettings.isZoomControlsEnabled = true
-//        googleMap.setOnMarkerClickListener(this)
-//        setUpMap()
-//    }
-
-
-    @SuppressLint("MissingPermission")
-    private fun setUpMap() {
-//        if (!isAccessFineLocationGranted(requireContext())) {
-//            requestAccessFineLocationPermission(requireContext(), this)
-//        }else{
-//            googleMap?.isMyLocationEnabled = true
-//            googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
-//            fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-//                if (location != null) {
-//                    lastLocation = location
-//                    val currentLatLng = LatLng(location.latitude, location.longitude)
-//                    favoriteLocations.add(currentLatLng)
-//                    placeMarkerOnMap()
-//                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-//                }
-//            }
-//        }
+    private fun getFavoritePlaces(location: Location) {
+        lifecycleScope.launchWhenStarted {
+            weatherViewModel.getFavoritePlaces().collect { favorites ->
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                favoriteLocations.add(currentLatLng)
+                setLocations(favorites)
+                placeCurrentLocationMarkerOnMap()
+            }
+        }
     }
 
-    private fun placeMarkerOnMap() {
+    private fun setLocations(favorites: List<FavoritePlacesEntity>) {
+        val locations =
+            favorites.filter { (it.latitude == currentLocation?.latitude && it.longitude == currentLocation?.longitude).not() }
+        locations.forEach {
+            favoriteLocations.add(LatLng(it.latitude!!, it.longitude!!))
+        }
+    }
+
+    private fun checkLocationPermission() {
+        when {
+            requireContext().isAccessFineLocationGranted() -> {
+                when {
+                    requireContext().isLocationEnabled() -> weatherViewModel.getCurrentLocation()
+                    else -> requireContext().showEnableGPSDialog()
+                }
+            }
+            else -> requestAccessFineLocationPermission()
+        }
+    }
+
+    private fun placeCurrentLocationMarkerOnMap() {
         val markerList: List<MarkerOptions>
         val builder = LatLngBounds.Builder()
         markerList = ArrayList()
         markerList.removeAll(markerList)
-        for (i in favoriteLocations.indices) {
+        for (i in 0 until favoriteLocations.size) {
             val titleStr = getAddress(favoriteLocations[i])
             val marker = MarkerOptions()
                 .position(favoriteLocations[i])
                 .title(titleStr)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            googleMap?.addMarker(marker)
+                .icon(bitmapDescriptorFromVector(requireContext(),
+                    if(favoriteLocations[i].latitude == currentLocation?.latitude && favoriteLocations[i].longitude == currentLocation?.longitude)
+                    R.drawable.current_location_marker else R.drawable.favorite_places_marker)
+                )
+            locationsMap?.addMarker(marker)
             markerList.add(marker)
         }
         for (marker in markerList) {
             builder.include(marker.position)
         }
         val bounds = builder.build()
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30))
+        locationsMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150,150,10))
     }
 
     private fun getAddress(latLng: LatLng): String {
@@ -148,41 +151,33 @@ class FavoritesMapsFragment : Fragment() {
                 }
             }
         } catch (e: IOException) {
-            Timber.e("MapsActivity", e.localizedMessage)
+            Timber.e("Maps Fragment", e.localizedMessage)
         }
         return addressText
     }
 
-    private fun createLocationRequest() {
-        locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-            maxWaitTime = 100
-        }
-        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val client = LocationServices.getSettingsClient(requireActivity())
-        val task = client.checkLocationSettings(builder.build())
-        task.addOnSuccessListener {
-            locationUpdateState = true
-            startLocationUpdates()
-        }
+    private fun requestAccessFineLocationPermission() {
+        Dexter.withContext(requireContext()).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(object :
+            PermissionListener {
+            override fun onPermissionGranted(ermissionGrantedResponse: PermissionGrantedResponse) {
+                weatherViewModel.getCurrentLocation()
+            }
+
+            override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
+                requireContext().toast("You need to allow location permission")
+            }
+
+            override fun onPermissionRationaleShouldBeShown(permissionRequest: PermissionRequest, permissionToken: PermissionToken) {
+                requireContext().showEnableGPSDialog()
+            }
+
+        }).check()
     }
 
-    @SuppressLint("MissingPermission")
-    private fun startLocationUpdates() {
-//        if (!isAccessFineLocationGranted(requireContext())) {
-//            requestAccessFineLocationPermission(requireContext(), activity = activity)
-//        }else{
-//            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
-//        }
-    }
+    override fun onMarkerClick(p0: Marker): Boolean = false
 
-//    override fun onMarkerClick(p0: Marker): Boolean = false
-
-    companion object{
+    companion object {
         private val favoriteLocations: MutableList<LatLng> = ArrayList()
     }
-
 
 }
