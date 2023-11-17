@@ -40,16 +40,16 @@ jobs:
         run: chmod +x ./gradlew
 
       #Getting Google Maps API key
-      - name: Get key GOOGLE_MAPS_API_KEY
+      - name: Get key MAPS_API_KEY
         env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-        run: echo GOOGLE_MAPS_API_KEY=\"GOOGLE_MAPS_API_KEY\" > ./local.properties
+          GOOGLE_MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+        run: echo MAPS_API_KEY=\"MAPS_API_KEY\" > ./local.properties
 
       #Getting Open Weather API key
-      - name: Get key WEATHER_API_KEY
+      - name: Get key OPEN_WEATHER_API_KEY
         env:
-          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-        run: echo WEATHER_API_KEY=\"WEATHER_API_KEY\" > ./local.properties
+          WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+        run: echo OPEN_WEATHER_API_KEY=\"OPEN_WEATHER_API_KEY\" > ./local.properties
 
       #Gradle
       - name: Make gradlew executable
