@@ -31,9 +31,9 @@ android {
             load(rootProject.file("local.properties").reader())
         }
 
-        buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL")}\"")
-        manifestPlaceholders["MAPS_API_KEY"] = properties.getProperty("MAPS_API_KEY")
-        resValue("string", "open_weather_api_key", properties.getProperty("OPEN_WEATHER_API_KEY"))
+        buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL", "")}\"")
+        manifestPlaceholders["MAPS_API_KEY"] = properties.getProperty("MAPS_API_KEY", "")
+        resValue("string", "open_weather_api_key", properties.getProperty("OPEN_WEATHER_API_KEY", ""))
     }
 
     buildTypes {
