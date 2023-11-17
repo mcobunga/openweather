@@ -11,4 +11,5 @@ object Constants {
     const val SEARCH_API_KEY = "029766644cb160efa51f2a32284310eb"
     const val UNITS = "metric"
     const val EXCLUDE = "current,minutely,hourly,alerts"
+    const val EXTRA_ACTIVITY_OPTIONS = "ActivityOptions"
 }

@@ -5,6 +5,7 @@ import com.bonface.openweather.data.local.dao.FavoritePlacesDao
 import com.bonface.openweather.data.local.dao.CurrentWeatherDao
 import com.bonface.openweather.data.local.dao.WeatherForecastDao
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
+import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
@@ -63,8 +64,6 @@ class WeatherRepository @Inject constructor(
     suspend fun deleteCurrentWeather(location: String) = currentWeatherDao.deleteCurrentWeather(location)
 
 
-
-
     fun getWeatherForecast() = weatherForecastDao.getWeatherWeather()
 
     suspend fun saveWeatherForecast(forecastEntity: ForecastEntity) = weatherForecastDao.saveWeatherWeather(forecastEntity)
@@ -72,6 +71,16 @@ class WeatherRepository @Inject constructor(
     suspend fun deleteWeatherForecast() = weatherForecastDao.deleteAllForecast()
 
     suspend fun deleteWeatherForecast(location: String) = weatherForecastDao.deleteWeatherForecast(location)
+
+
+
+    fun getFavoritePlaces() = favoriteLocationDao.getFavoritePlaces()
+
+    suspend fun saveFavoritePlace(favoritePlacesEntity: FavoritePlacesEntity) = favoriteLocationDao.saveFavoritePlace(favoritePlacesEntity)
+
+    suspend fun deleteAllLocations() = favoriteLocationDao.deleteAllPlaces()
+
+    suspend fun isLocationAlreadyExists(latitude: Double, longitude: Double) = favoriteLocationDao.isLocationAlreadyExists(latitude, longitude)
 
 
 }

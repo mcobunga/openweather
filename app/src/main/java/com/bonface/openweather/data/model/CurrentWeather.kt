@@ -26,4 +26,12 @@ data class CurrentWeather(
     @Json(name="id") val id: Long? = null,
     @Json(name="base") val base: String? = null,
     @Json(name="wind") val wind: Wind? = null,
-) : Parcelable
+) : Parcelable {
+    fun lastUpdated(): String {
+        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+        return run {
+            val netDate = Date(dt!! * 1000)
+            sdf.format(netDate)
+        }
+    }
+}

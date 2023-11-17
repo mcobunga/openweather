@@ -21,7 +21,7 @@ const val TABLE_WEATHER_FORECAST = "weather_forecast"
         ForecastEntity::class,
         FavoritePlacesEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 

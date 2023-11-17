@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class PlacesFragmentAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+
     override fun createFragment(position: Int): Fragment {
         return fragments[position]
     }
@@ -15,7 +16,7 @@ class PlacesFragmentAdapter(fm: FragmentManager, lifecycle: Lifecycle) : Fragmen
     }
 
     private val fragments = listOf(
-        PlacesListFragment(),
+        FavoritePlacesFragment(),
         FavoritesMapsFragment()
     )
 

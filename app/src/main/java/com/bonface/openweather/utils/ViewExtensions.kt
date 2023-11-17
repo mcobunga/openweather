@@ -21,10 +21,6 @@ fun View.hide() {
     visibility = View.INVISIBLE
 }
 
-fun AppCompatActivity.snackbar(view: View, message: String, duration: Int = Snackbar.LENGTH_LONG) {
-    Snackbar.make(view, message, duration).show()
-}
-
 fun View.backgroundTint(context: Context, color: Int) {
     backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, color))
 }
