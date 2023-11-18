@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.konan.properties.Properties
-import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     id("com.android.application")
