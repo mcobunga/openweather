@@ -13,6 +13,7 @@ import com.bonface.openweather.utils.hide
 import com.bonface.openweather.utils.lastUpdated
 import com.bonface.openweather.utils.show
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListAdapter.ViewHolder>() {
 

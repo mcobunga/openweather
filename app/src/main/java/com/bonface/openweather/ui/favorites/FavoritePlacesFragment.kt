@@ -17,7 +17,7 @@ import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
-import com.bonface.openweather.utils.roundOffDecimal
+import com.bonface.openweather.utils.roundOffLatLonDecimal
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,7 +79,7 @@ class FavoritePlacesFragment : Fragment() {
     private fun setAdapterData(location: Location?, places: List<FavoritePlacesEntity>) {
         if (places.isNotEmpty()) {
             places.forEach {
-                if (location != null && (roundOffDecimal(location.latitude) == it.latitude && roundOffDecimal(location.longitude) == it.longitude)) {
+                if (location != null && (roundOffLatLonDecimal(location.latitude) == it.latitude && roundOffLatLonDecimal(location.longitude) == it.longitude)) {
                     it.isCurrentLocation = true
                 }
             }

@@ -3,9 +3,10 @@ package com.bonface.openweather.utils
 import com.bonface.openweather.R
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 fun getTemperature(temp: Double?): String {
-    return "$temp°"
+    return "${temp?.roundToInt()}°"
 }
 
 fun getCurrentWeatherImage(weatherId: Int?): Int {
@@ -20,7 +21,7 @@ fun getForecastWeatherIcon(weatherId: Int?): Int {
     return forecastWeatherIcon(weatherId.toString())
 }
 
-fun roundOffDecimal(number: Double): Double {
+fun roundOffLatLonDecimal(number: Double): Double {
     val df = DecimalFormat("#.###")
     df.roundingMode = RoundingMode.CEILING
     return df.format(number).toDouble()

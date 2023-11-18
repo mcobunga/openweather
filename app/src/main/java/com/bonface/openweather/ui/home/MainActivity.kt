@@ -189,7 +189,6 @@ class MainActivity : AppCompatActivity() {
     private fun updateWeatherViews(weather: List<CurrentWeatherEntity>) {
         with(binding) {
             weather.firstOrNull().apply {
-
                 weatherLayout.setBackgroundColor(ContextCompat.getColor(this@MainActivity, getCurrentWeatherBackgroundColor(this?.weatherId)))
                 currentWeatherLayout.background = ContextCompat.getDrawable(this@MainActivity, getCurrentWeatherImage(this?.weatherId))
                 currentLocation.text = getString(R.string.user_location, this?.name.toString(), this?.country.toString())

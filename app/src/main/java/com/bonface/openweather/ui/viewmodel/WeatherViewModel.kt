@@ -14,7 +14,7 @@ import com.bonface.openweather.repository.WeatherRepository
 import com.bonface.openweather.utils.ErrorHandler
 import com.bonface.openweather.utils.LocationProvider
 import com.bonface.openweather.utils.Resource
-import com.bonface.openweather.utils.roundOffDecimal
+import com.bonface.openweather.utils.roundOffLatLonDecimal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -102,7 +102,7 @@ class WeatherViewModel @Inject constructor(
 
     fun isLocationAlreadyExists(location: Location) = viewModelScope.launch(Dispatchers.IO) {
         try {
-            weatherRepository.isLocationAlreadyExists(roundOffDecimal(location.latitude), roundOffDecimal(location.longitude)).apply {
+            weatherRepository.isLocationAlreadyExists(roundOffLatLonDecimal(location.latitude), roundOffLatLonDecimal(location.longitude)).apply {
                 _isExists.postValue(this)
             }
         } catch (e: Exception) {
