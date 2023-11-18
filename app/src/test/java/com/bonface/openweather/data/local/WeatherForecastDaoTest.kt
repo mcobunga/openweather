@@ -13,7 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
-@Config(sdk = [Config.OLDEST_SDK], manifest = Config.NONE)
+
 @RunWith(AndroidJUnit4::class)
 class WeatherForecastDaoTest: OpenWeatherBaseTest() {
 
