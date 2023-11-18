@@ -22,16 +22,6 @@ fun Activity.startActivity(intent: () -> Intent) {
     }
 }
 
-fun AppCompatActivity.snackbar(view: View, message: String, duration: Int = Snackbar.LENGTH_LONG) {
-    Snackbar.make(view, message, duration).show()
-}
-
 fun Fragment.snackbar(view: View, message: String, duration: Int = Snackbar.LENGTH_LONG) {
     Snackbar.make(view, message, duration).show()
-}
-
-fun roundOffDecimal(number: Double): Double {
-    val df = DecimalFormat("#.###")
-    df.roundingMode = RoundingMode.CEILING
-    return df.format(number).toDouble()
 }

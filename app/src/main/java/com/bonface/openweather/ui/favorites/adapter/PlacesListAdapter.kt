@@ -1,6 +1,5 @@
 package com.bonface.openweather.ui.favorites.adapter
 
-import android.location.Location
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -9,10 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.databinding.ItemFavoritePlacesBinding
-import com.bonface.openweather.utils.gone
-import com.bonface.openweather.utils.roundOffDecimal
+import com.bonface.openweather.utils.getTemperature
+import com.bonface.openweather.utils.hide
+import com.bonface.openweather.utils.lastUpdated
 import com.bonface.openweather.utils.show
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListAdapter.ViewHolder>() {
 
@@ -38,14 +39,14 @@ class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListA
         val place = differ.currentList[position]
         with(holder.binding) {
             location.text = holder.itemView.context.getString(R.string.fav_location, place.location, place.country)
-            locationTemp.text = place.getTemperature()
+            locationTemp.text = getTemperature(place.temp)
             locationWeather.text = place.weatherMain
-            lastUpdatedAt.text = place.lastUpdated()
+            lastUpdatedAt.text = lastUpdated(place.lastUpdatedAt)
             if (place.isCurrentLocation == true ) {
                 currentLocation.show()
-                lastUpdatedAt.gone()
+                lastUpdatedAt.hide()
             } else {
-                currentLocation.gone()
+                currentLocation.hide()
                 lastUpdatedAt.show()
             }
         }

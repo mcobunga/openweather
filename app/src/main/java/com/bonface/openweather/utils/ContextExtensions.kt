@@ -34,17 +34,6 @@ fun Context.isAccessFineLocationGranted(): Boolean {
     ) == PackageManager.PERMISSION_GRANTED
 }
 
-fun Context.getTintedDrawable(
-    @DrawableRes drawableResId: Int,
-    @ColorRes colorResId: Int
-): Drawable? {
-    if (drawableResId == 0) return null
-    val drawable = getDrawableCompat(drawableResId).mutate()
-    val color = getColorCompat(colorResId)
-    drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
-    return drawable
-}
-
 fun Context.hideKeyboard(view: View) {
     if (view.isInEditMode) return
     view.post {
@@ -87,16 +76,6 @@ fun Context.showKeyboard(view: View) {
         )
     }, 200)
 }
-
-fun Context.getDrawableCompat(@DrawableRes drawableId: Int): Drawable =
-    ContextCompat.getDrawable(this, drawableId)!!
-
-fun Context.getColorCompat(@ColorRes colorResId: Int): Int =
-    ContextCompat.getColor(this, colorResId)
-
-fun Context.getAppCompatDrawable(@DrawableRes resId: Int): Drawable? =
-    AppCompatResources.getDrawable(this, resId)
-
 
 fun Context.toast(message: String, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this, message, duration).show()

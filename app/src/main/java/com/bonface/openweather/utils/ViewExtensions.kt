@@ -25,10 +25,6 @@ fun View.hide() {
     visibility = View.INVISIBLE
 }
 
-fun View.backgroundTint(context: Context, color: Int) {
-    backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, color))
-}
-
 fun bitmapDescriptorFromVector(
     context: Context,
     vectorResId: Int

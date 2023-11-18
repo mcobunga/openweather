@@ -7,7 +7,6 @@ import android.location.Location
 import android.os.Bundle
 import android.view.Window
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -21,10 +20,15 @@ import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.databinding.ActivityMainBinding
 import com.bonface.openweather.ui.favorites.FavoritePlacesActivity
 import com.bonface.openweather.ui.search.PlacesSearchActivity
+import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.Resource
+import com.bonface.openweather.utils.getCurrentWeatherBackgroundColor
+import com.bonface.openweather.utils.getCurrentWeatherImage
+import com.bonface.openweather.utils.getTemperature
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
+import com.bonface.openweather.utils.lastUpdated
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.showEnableGPSDialog
 import com.bonface.openweather.utils.startActivity
@@ -37,6 +41,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     private val splashViewModel: SplashViewModel by viewModels()
     private val weatherViewModel: WeatherViewModel by viewModels()
-    private var isAllFabsVisible: Boolean? = false
+    private var isFabsVisible: Boolean? = false
     private var isWeatherInfoLoaded: Boolean? = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        isAllFabsVisible = false
+        isFabsVisible = false
     }
 
     override fun onStop() {
@@ -124,7 +129,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun getCachedWeatherInfo() {
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launch {
             weatherViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
                 if (currentWeather.isNotEmpty()) {
                     isWeatherInfoLoaded = true
@@ -133,7 +138,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launch {
             weatherViewModel.getWeatherForecastFromDb().collect { dailyForecast ->
                 if (dailyForecast.isNotEmpty()) {
                     forecastAdapter.differ.submitList(dailyForecast.take(5))
@@ -184,21 +189,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateWeatherViews(weather: List<CurrentWeatherEntity>) {
         with(binding) {
             weather.firstOrNull().apply {
-
-                this?.getCurrentWeatherBackgroundColor()
-                    ?.let { ContextCompat.getColor(this@MainActivity, it) }
-                    ?.let { weatherLayout.setBackgroundColor(it) }
-
-                currentWeatherLayout.background = this?.getCurrentWeatherImage()
-                    ?.let { ContextCompat.getDrawable(this@MainActivity, it) }
+                weatherLayout.setBackgroundColor(ContextCompat.getColor(this@MainActivity, getCurrentWeatherBackgroundColor(this?.weatherId)))
+                currentWeatherLayout.background = ContextCompat.getDrawable(this@MainActivity, getCurrentWeatherImage(this?.weatherId))
                 currentLocation.text = getString(R.string.user_location, this?.name.toString(), this?.country.toString())
-                currentTemp.text = this?.getTemperature()
+                currentTemp.text = getTemperature(this?.temp)
                 currentWeather.text = this?.weatherMain
-                lastUpdatedAt.text = getString(R.string.last_updated, this?.lastUpdated())
-                minTemperatureValue.text = this?.getMinTemperature()
-                currentTemperatureValue.text = this?.getTemperature()
-                maxTemperatureValue.text = this?.getMaxTemperature()
-                this?.getCurrentWeatherImage()?.let { updateStatusBarColor(it) }
+                lastUpdatedAt.text = getString(R.string.last_updated, lastUpdated(this?.lastUpdatedAt!!))
+                minTemperatureValue.text = getTemperature(this.minTemp)
+                currentTemperatureValue.text = getTemperature(this.temp)
+                maxTemperatureValue.text = getTemperature(this.maxTemp)
+                updateStatusBarColor(getCurrentWeatherImage(this.weatherId))
             }
         }
     }
@@ -222,7 +222,7 @@ class MainActivity : AppCompatActivity() {
             weatherViewModel.getCurrentWeatherFromRemote(location!!)
             weatherViewModel.getWeatherForecastFromRemote(location!!)
         } else {
-            toast("Enable location permissions")
+            toast(getString(R.string.enable_location_permissions))
         }
     }
 
@@ -243,26 +243,38 @@ class MainActivity : AppCompatActivity() {
         with(binding) {
             fab.shrink()
             fab.setOnClickListener {
-                isAllFabsVisible = if (!isAllFabsVisible!!) {
-                    favoritePlaces.show()
-                    if (isWeatherInfoLoaded == true) addFavorite.show() else addFavorite.hide()
-                    if (isWeatherInfoLoaded == true) addFavActionText.show() else addFavActionText.gone()
-                    searchPlaces.show()
-                    favoritesActionText.show()
-                    searchActionText.show()
-                    fab.extend()
+                isFabsVisible = if (!isFabsVisible!!) {
+                    showFabOptionsClickListener()
                     true
                 } else {
-                    favoritePlaces.hide()
-                    addFavorite.hide()
-                    searchPlaces.hide()
-                    favoritesActionText.gone()
-                    addFavActionText.gone()
-                    searchActionText.gone()
-                    fab.shrink()
+                    hideFabOptionsClickListener()
                     false
                 }
             }
+        }
+    }
+
+    private fun showFabOptionsClickListener() {
+        with(binding) {
+            favoritePlaces.show()
+            if (isWeatherInfoLoaded == true) addFavorite.show() else addFavorite.hide()
+            if (isWeatherInfoLoaded == true) addFavActionText.show() else addFavActionText.gone()
+            searchPlaces.show()
+            favoritesActionText.show()
+            searchActionText.show()
+            fab.extend()
+        }
+    }
+
+    private fun hideFabOptionsClickListener() {
+        with(binding) {
+            favoritePlaces.hide()
+            addFavorite.hide()
+            searchPlaces.hide()
+            favoritesActionText.gone()
+            addFavActionText.gone()
+            searchActionText.gone()
+            fab.shrink()
         }
     }
 
@@ -273,7 +285,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onPermissionDenied(permissionDeniedResponse: PermissionDeniedResponse) {
-                    toast("You need to allow location permission")
+                    toast(getString(R.string.you_need_to_allow_location_permission))
                     finish()
                 }
 
@@ -286,11 +298,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveToFavoriteLocations() {
         if (location != null) {
-            weatherViewModel.isExists.observe(this) {
-                if (!it) {
+            weatherViewModel.isExists.observe(this) { exists ->
+                if (!exists) {
                     currentWeather?.let { weatherViewModel.saveLocationToFavorites(it) }
-                    toast("Successfully added to favorites")
-                } else toast("Already exists in your favorites")
+                    toast(getString(R.string.add_to_favorites_success_message))
+                } else toast(getString(R.string.already_exists_in_favorites_message))
             }
             weatherViewModel.isLocationAlreadyExists(location!!)
         }

@@ -23,4 +23,22 @@
     <string name="home_empty_state">No weather data loaded</string>
     <string name="fav_location">%1$s, %2$s</string>
     <string name="search_hint">Search for a location</string>
+
+    <!--  Error responses  -->
+    <string name="no_internet_connection">No internet connection, try again</string>
+    <string name="app_update_needed">You need to update the app and try again</string>
+    <string name="problem_processing_request">There was a problem processing your request. Please try again</string>
+    <string name="unable_to_connect">Unable to connect, check your connection</string>
+    <string name="internal_server_error">Internal server error, try again later.</string>
+    <string name="service_unavailable">Service temporarily unavailable, try again later</string>
+    <string name="no_server_response">There was a problem completing your request. Try again later.</string>
+
+    <!--  Permissions error response  -->
+    <string name="you_need_to_allow_location_permission">You need to allow location permission</string>
+    <string name="enable_location_permissions">Enable location permissions</string>
+
+    <!--  db error response  -->
+    <string name="add_to_favorites_success_message">Successfully added to favorites</string>
+    <string name="already_exists_in_favorites_message">Already exists in your favorites</string>
+    <string name="empty_favorites_message">You don\'t have any favorite places saved</string>
 </resources>
