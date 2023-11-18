@@ -22,6 +22,7 @@ import com.bonface.openweather.utils.getCurrentWeatherBackgroundColor
 import com.bonface.openweather.utils.getCurrentWeatherImage
 import com.bonface.openweather.utils.getTemperature
 import com.bonface.openweather.utils.lastUpdated
+import com.bonface.openweather.utils.toast
 import com.bonface.openweather.utils.updateStatusBarColor
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -118,6 +119,8 @@ class SearchedLocationWeatherBottomSheet : BottomSheetDialogFragment() {
     private fun setButtonListener() {
         binding.saveLocation.setOnClickListener {
             currentWeather?.let { location -> weatherViewModel.saveLocationToFavorites(location) }
+            activity?.toast(getString(R.string.add_to_favorites_success_message))
+            dismiss()
         }
     }
 
