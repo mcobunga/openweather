@@ -20,19 +20,19 @@ object ErrorHandler {
             is SocketTimeoutException -> MobileException("There was a problem processing your request. Please try again", 3000)
             is SSLHandshakeException -> MobileException("You need to update the app and try again", 4000)
             is ConnectException -> MobileException("There was a problem processing your request. Please try again", 5000)
-            is HttpException -> extractHttpExceptions(exception)
+            is HttpException -> getServerSideExceptions(exception)
             is IOException -> MobileException("Unable to connect, check your connection", 2000)
             else -> MobileException(exception.message.toString(), 1)
         }
     }
 
-    private fun extractHttpExceptions(e: HttpException): MobileException {
+    private fun getServerSideExceptions(e: HttpException): MobileException {
         val body = e.response()?.errorBody()
         val jsonString = body?.string()
         val message = try {
             val jsonObject = jsonString?.let { JSONObject(it) }
             jsonObject?.getString("message")
-        } catch (exception: JSONException) {
+        } catch (jsonException: JSONException) {
             when (e.code()) {
                 500 -> "Internal server error, try again later."
                 503 -> "Service temporarily unavailable, try again later"

@@ -21,7 +21,6 @@ class LocationProvider @Inject constructor(private val fusedLocationProviderClie
     @SuppressLint("MissingPermission")
     fun getLocation(): Flow<Location> = callbackFlow {
         // for getting the current location update after every 30 seconds with high accuracy
-
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 30000).apply {
             setMinUpdateDistanceMeters(1000F)
             setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)

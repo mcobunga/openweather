@@ -1,4 +1,4 @@
-package com.bonface.openweather.ui.home
+package com.bonface.openweather.ui.viewmodel
 
 import android.location.Location
 import androidx.lifecycle.LiveData
@@ -18,7 +18,6 @@ import com.bonface.openweather.utils.roundOffDecimal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -31,7 +30,6 @@ class WeatherViewModel @Inject constructor(
 
     private val _current = MutableLiveData<Resource<CurrentWeather>>()
     private val _forecast = MutableLiveData<Resource<WeatherForecast>>()
-    private val _favorites = MutableLiveData<Resource<WeatherForecast>>()
     private var _currentLocation: MutableLiveData<Location> = MutableLiveData()
     private var _isExists: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -39,8 +37,7 @@ class WeatherViewModel @Inject constructor(
         get() = _current
     val forecastWeather: LiveData<Resource<WeatherForecast>>
         get() = _forecast
-    val favoritePlaces: LiveData<Resource<WeatherForecast>>
-        get() = _favorites
+
     val currentLocation: LiveData<Location>
         get() = _currentLocation
     val isExists: LiveData<Boolean>
@@ -50,9 +47,8 @@ class WeatherViewModel @Inject constructor(
         _current.postValue(Resource.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                weatherRepository.getCurrentLocationWeather(location).collect{
-                    _current.postValue(handleResponse(it))
-                }
+                val result = weatherRepository.getCurrentLocationWeather(location)
+                _current.postValue(handleResponse(result))
             } catch (e: Exception) {
                 e.printStackTrace()
                 val error = ErrorHandler.handleException(e)
@@ -65,9 +61,8 @@ class WeatherViewModel @Inject constructor(
         _forecast.postValue(Resource.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                weatherRepository.getCurrentLocationWeatherForecast(location).collect{
-                    _forecast.postValue(handleForecastResponse(it))
-                }
+                val result = weatherRepository.getCurrentLocationWeatherForecast(location)
+                _forecast.postValue(handleForecastResponse(result))
             } catch (e: Exception) {
                 e.printStackTrace()
                 val error = ErrorHandler.handleException(e)
@@ -94,16 +89,8 @@ class WeatherViewModel @Inject constructor(
         weatherRepository.deleteCurrentWeather()
     }
 
-    fun deleteCurrentWeatherFromDb(location: String) = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.deleteCurrentWeather(location)
-    }
-
     fun deleteWeatherForecast() = viewModelScope.launch(Dispatchers.IO) {
         weatherRepository.deleteWeatherForecast()
-    }
-
-    fun deleteWeatherForecast(location: String) = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.deleteWeatherForecast(location)
     }
 
 
@@ -112,11 +99,6 @@ class WeatherViewModel @Inject constructor(
     }
 
     fun getFavoritePlaces() = weatherRepository.getFavoritePlaces()
-
-
-    fun clearFavoriteLocations() = viewModelScope.launch(Dispatchers.IO) {
-        weatherRepository.deleteAllLocations()
-    }
 
     fun isLocationAlreadyExists(location: Location) = viewModelScope.launch(Dispatchers.IO) {
         try {

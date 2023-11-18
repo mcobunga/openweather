@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.databinding.FragmentFavoritesMapsBinding
-import com.bonface.openweather.ui.home.WeatherViewModel
+import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.bitmapDescriptorFromVector
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
@@ -36,6 +36,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.IOException
 
@@ -83,7 +84,7 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     private fun getFavoritePlaces(location: Location) {
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launch {
             weatherViewModel.getFavoritePlaces().collect { favorites ->
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 favoriteLocations.add(currentLatLng)

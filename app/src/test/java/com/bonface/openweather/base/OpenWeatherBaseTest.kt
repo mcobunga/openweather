@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 open class OpenWeatherBaseTest : TestCase() {
 
-    private lateinit var openWeatherApi: OpenWeatherApi
+    lateinit var openWeatherApi: OpenWeatherApi
     private lateinit var database: OpenWeatherDatabase
     private lateinit var loggingInterceptor: HttpLoggingInterceptor
     lateinit var currentWeatherDao: CurrentWeatherDao

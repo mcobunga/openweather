@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.databinding.ItemWeatherForecastBinding
+import com.bonface.openweather.utils.getDay
+import com.bonface.openweather.utils.getForecastWeatherIcon
+import com.bonface.openweather.utils.getTemperature
 import javax.inject.Inject
 
 class ForecastAdapter @Inject constructor() : RecyclerView.Adapter<ForecastAdapter.ViewHolder>() {
@@ -32,9 +35,9 @@ class ForecastAdapter @Inject constructor() : RecyclerView.Adapter<ForecastAdapt
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val forecast = differ.currentList[position]
         holder.binding.apply {
-            day.text = forecast.getDay()
-            forecast.getForecastWeatherIcon().let { weather.setImageResource(it) }
-            temperature.text = forecast.getTemperature()
+            day.text = getDay(forecast.dayOfWeek!!)
+            weather.setImageResource(getForecastWeatherIcon(forecast.weatherId))
+            temperature.text = getTemperature(forecast.dayTemp)
         }
     }
 
