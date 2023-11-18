@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.bonface.openweather.data.local.dao.FavoritePlacesDao
 import com.bonface.openweather.data.local.dao.CurrentWeatherDao
+import com.bonface.openweather.data.local.dao.FavoritePlacesDao
 import com.bonface.openweather.data.local.dao.WeatherForecastDao
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity

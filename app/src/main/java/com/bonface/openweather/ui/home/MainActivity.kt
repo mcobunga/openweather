@@ -19,7 +19,9 @@ import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.databinding.ActivityMainBinding
 import com.bonface.openweather.ui.favorites.FavoritePlacesActivity
-import com.bonface.openweather.ui.search.PlacesSearchActivity
+import com.bonface.openweather.ui.home.adapter.ForecastAdapter
+import com.bonface.openweather.ui.search.SearchPlacesActivity
+import com.bonface.openweather.ui.viewmodel.SplashViewModel
 import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.Resource
 import com.bonface.openweather.utils.getCurrentWeatherBackgroundColor
@@ -33,6 +35,7 @@ import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.showEnableGPSDialog
 import com.bonface.openweather.utils.startActivity
 import com.bonface.openweather.utils.toast
+import com.bonface.openweather.utils.updateStatusBarColor
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -226,19 +229,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateStatusBarColor(resource: Int) {
-        val bitMap = BitmapFactory.decodeResource(resources, resource)
-        Palette.Builder(bitMap).generate { result ->
-            result?.let {
-                val dominantSwatch = it.dominantSwatch
-                if (dominantSwatch != null) {
-                    val window: Window = window
-                    window.statusBarColor = dominantSwatch.rgb
-                }
-            }
-        }
-    }
-
     private fun setFloatingButtonController() {
         with(binding) {
             fab.shrink()
@@ -313,7 +303,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToSearch() {
-        startActivity { Intent(this, PlacesSearchActivity::class.java) }
+        startActivity { Intent(this, SearchPlacesActivity::class.java) }
     }
 
     private fun showLoading() {

@@ -4,14 +4,8 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.bonface.openweather.R
 import com.bonface.openweather.data.local.TABLE_CURRENT_WEATHER
-import com.bonface.openweather.data.local.TABLE_WEATHER_FORECAST
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Entity(tableName = TABLE_CURRENT_WEATHER)
 @Parcelize

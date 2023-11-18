@@ -1,10 +1,8 @@
 package com.bonface.openweather.mappers
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
+import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
 

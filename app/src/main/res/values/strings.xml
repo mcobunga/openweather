@@ -41,4 +41,9 @@
     <string name="add_to_favorites_success_message">Successfully added to favorites</string>
     <string name="already_exists_in_favorites_message">Already exists in your favorites</string>
     <string name="empty_favorites_message">You don\'t have any favorite places saved</string>
+
+    <string name="searching">Searching…🔎</string>
+    <string name="fetching_weather">Getting weather info for %1$s</string>
+    <string name="bottom_sheet_title">Current Weather For %1$s</string>
+    <string name="bottom_sheet_button_text">Save to favorites</string>
 </resources>

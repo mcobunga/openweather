@@ -1,5 +1,6 @@
-package com.bonface.openweather.ui.favorites
+package com.bonface.openweather.ui.favorites.placesList
 
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.databinding.FragmentFavoritePlacesBinding
-import com.bonface.openweather.ui.favorites.adapter.PlacesListAdapter
+import com.bonface.openweather.ui.search.SearchPlacesActivity
 import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
@@ -20,6 +21,7 @@ import com.bonface.openweather.utils.isLocationEnabled
 import com.bonface.openweather.utils.roundOffLatLonDecimal
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.snackbar
+import com.bonface.openweather.utils.startActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Collections
@@ -44,6 +46,9 @@ class FavoritePlacesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
         checkLocationPermission()
+        binding.searchNewLocation.setOnClickListener {
+            activity?.startActivity { Intent(context, SearchPlacesActivity::class.java) }
+        }
     }
 
     private fun checkLocationPermission() {
