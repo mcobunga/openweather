@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.bonface.openweather.data.local.TABLE_FAVORITE_PLACES
-import com.bonface.openweather.data.local.TABLE_WEATHER_FORECAST
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import kotlinx.coroutines.flow.Flow
 

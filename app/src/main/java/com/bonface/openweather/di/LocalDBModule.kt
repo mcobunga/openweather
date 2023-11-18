@@ -3,8 +3,8 @@ package com.bonface.openweather.di
 import android.content.Context
 import androidx.room.Room
 import com.bonface.openweather.data.local.OpenWeatherDatabase
-import com.bonface.openweather.data.local.dao.FavoritePlacesDao
 import com.bonface.openweather.data.local.dao.CurrentWeatherDao
+import com.bonface.openweather.data.local.dao.FavoritePlacesDao
 import com.bonface.openweather.data.local.dao.WeatherForecastDao
 import dagger.Module
 import dagger.Provides

@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.bonface.openweather.data.local.TABLE_WEATHER_FORECAST
 import com.bonface.openweather.data.local.entity.ForecastEntity
-import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

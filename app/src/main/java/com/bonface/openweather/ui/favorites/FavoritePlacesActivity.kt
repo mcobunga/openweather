@@ -11,6 +11,7 @@ import com.bonface.openweather.utils.startActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class FavoritePlacesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFavoritePlacesBinding

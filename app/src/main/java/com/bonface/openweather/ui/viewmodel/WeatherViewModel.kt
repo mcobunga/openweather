@@ -32,6 +32,7 @@ class WeatherViewModel @Inject constructor(
     private val _forecast = MutableLiveData<Resource<WeatherForecast>>()
     private var _currentLocation: MutableLiveData<Location> = MutableLiveData()
     private var _isExists: MutableLiveData<Boolean> = MutableLiveData()
+    private val searchedLocation = MutableLiveData<List<CurrentWeather>?>()
 
     val currentWeather: LiveData<Resource<CurrentWeather>>
         get() = _current
@@ -42,6 +43,7 @@ class WeatherViewModel @Inject constructor(
         get() = _currentLocation
     val isExists: LiveData<Boolean>
         get() = _isExists
+    val searchResultWeather: LiveData<List<CurrentWeather>?> = searchedLocation
 
     fun getCurrentWeatherFromRemote(location: Location) {
         _current.postValue(Resource.Loading())
@@ -134,6 +136,10 @@ class WeatherViewModel @Inject constructor(
             _currentLocation.postValue(location)
             cancel()
         }
+    }
+
+    fun setBottomSheetWeather(weather: List<CurrentWeather>?){
+        searchedLocation.value = weather
     }
 
 

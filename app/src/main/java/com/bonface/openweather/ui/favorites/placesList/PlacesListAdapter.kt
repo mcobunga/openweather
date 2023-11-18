@@ -1,4 +1,4 @@
-package com.bonface.openweather.ui.favorites.adapter
+package com.bonface.openweather.ui.favorites.placesList
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,11 +9,10 @@ import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.databinding.ItemFavoritePlacesBinding
 import com.bonface.openweather.utils.getTemperature
-import com.bonface.openweather.utils.hide
+import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.lastUpdated
 import com.bonface.openweather.utils.show
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListAdapter.ViewHolder>() {
 
@@ -44,9 +43,9 @@ class PlacesListAdapter @Inject constructor() : RecyclerView.Adapter<PlacesListA
             lastUpdatedAt.text = lastUpdated(place.lastUpdatedAt)
             if (place.isCurrentLocation == true ) {
                 currentLocation.show()
-                lastUpdatedAt.hide()
+                lastUpdatedAt.gone()
             } else {
-                currentLocation.hide()
+                currentLocation.gone()
                 lastUpdatedAt.show()
             }
         }

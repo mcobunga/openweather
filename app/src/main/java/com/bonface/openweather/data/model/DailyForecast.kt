@@ -1,18 +1,9 @@
 package com.bonface.openweather.data.model
 
-import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Parcelable
-import androidx.annotation.RequiresApi
-import com.bonface.openweather.R
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
-import java.text.SimpleDateFormat
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.TextStyle
-import java.util.*
 
 @JsonClass(generateAdapter = true)
 @Parcelize

@@ -1,4 +1,4 @@
-package com.bonface.openweather.ui.home
+package com.bonface.openweather.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

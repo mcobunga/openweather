@@ -1,17 +1,12 @@
 package com.bonface.openweather.utils
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.view.View
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.bonface.openweather.R
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.material.snackbar.Snackbar
 
 fun View.show() {
     visibility = View.VISIBLE
@@ -19,10 +14,6 @@ fun View.show() {
 
 fun View.gone() {
     visibility = View.GONE
-}
-
-fun View.hide() {
-    visibility = View.INVISIBLE
 }
 
 fun bitmapDescriptorFromVector(

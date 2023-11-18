@@ -4,12 +4,8 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.bonface.openweather.R
 import com.bonface.openweather.data.local.TABLE_FAVORITE_PLACES
 import kotlinx.parcelize.Parcelize
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Entity(tableName = TABLE_FAVORITE_PLACES)
 @Parcelize

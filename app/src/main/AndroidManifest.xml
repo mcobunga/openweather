@@ -25,7 +25,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".ui.search.PlacesSearchActivity"
+            android:name=".ui.search.SearchPlacesActivity"
             android:exported="false" />
         <activity
             android:name=".ui.favorites.FavoritePlacesActivity"

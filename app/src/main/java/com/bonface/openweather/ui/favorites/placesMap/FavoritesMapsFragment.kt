@@ -1,8 +1,7 @@
-package com.bonface.openweather.ui.favorites
+package com.bonface.openweather.ui.favorites.placesMap
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
@@ -19,6 +18,7 @@ import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.bitmapDescriptorFromVector
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
+import com.bonface.openweather.utils.roundOffLatLonDecimal
 import com.bonface.openweather.utils.showEnableGPSDialog
 import com.bonface.openweather.utils.toast
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -46,7 +46,7 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     private var _binding: FragmentFavoritesMapsBinding? = null
     private val weatherViewModel: WeatherViewModel by viewModels()
     private lateinit var mapFragment: SupportMapFragment
-    private var locationsMap: GoogleMap? = null
+    private var mMap: GoogleMap? = null
     private var currentLocation: Location? = null
     private val binding get() = _binding!!
 
@@ -67,9 +67,9 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        locationsMap = googleMap
-        locationsMap?.uiSettings?.isZoomControlsEnabled = true
-        locationsMap?.setOnMarkerClickListener(this)
+        mMap = googleMap
+        mMap?.uiSettings?.isZoomControlsEnabled = true
+        mMap?.setOnMarkerClickListener(this)
         checkLocationPermission()
     }
 
@@ -77,8 +77,8 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     private fun setLocationObserver() {
         weatherViewModel.currentLocation.observe(viewLifecycleOwner) {
             currentLocation = it
-            locationsMap?.isMyLocationEnabled = true
-            locationsMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+            mMap?.isMyLocationEnabled = true
+            mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
             getFavoritePlaces(it)
         }
     }
@@ -86,20 +86,20 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     private fun getFavoritePlaces(location: Location) {
         lifecycleScope.launch {
             weatherViewModel.getFavoritePlaces().collect { favorites ->
-                val currentLatLng = LatLng(location.latitude, location.longitude)
+                val currentLatLng = LatLng(roundOffLatLonDecimal(location.latitude), roundOffLatLonDecimal(location.longitude))
+                favoriteLocations.clear()
                 favoriteLocations.add(currentLatLng)
                 setLocations(favorites)
-                placeCurrentLocationMarkerOnMap()
             }
         }
     }
 
     private fun setLocations(favorites: List<FavoritePlacesEntity>) {
-        val locations =
-            favorites.filter { (it.latitude == currentLocation?.latitude && it.longitude == currentLocation?.longitude).not() }
+        val locations = favorites.filter { (it.latitude == currentLocation?.latitude && it.longitude == currentLocation?.longitude).not() }
         locations.forEach {
             favoriteLocations.add(LatLng(it.latitude!!, it.longitude!!))
         }
+        placeCurrentLocationMarkerOnMap()
     }
 
     private fun checkLocationPermission() {
@@ -115,44 +115,41 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     private fun placeCurrentLocationMarkerOnMap() {
-        val markerList: List<MarkerOptions>
+        val markerList = mutableListOf<MarkerOptions>()
         val builder = LatLngBounds.Builder()
-        markerList = ArrayList()
-        markerList.removeAll(markerList)
-        for (i in 0 until favoriteLocations.size) {
-            val titleStr = getAddress(favoriteLocations[i])
+        markerList.clear()
+        val favorites = favoriteLocations.distinct()
+        for (i in favorites.indices) {
+            val titleStr = getAddress(favorites[i])
             val marker = MarkerOptions()
-                .position(favoriteLocations[i])
+                .position(favorites[i])
                 .title(titleStr)
                 .icon(bitmapDescriptorFromVector(requireContext(),
-                    if(favoriteLocations[i].latitude == currentLocation?.latitude && favoriteLocations[i].longitude == currentLocation?.longitude)
+                    if(favorites[i].latitude == roundOffLatLonDecimal(currentLocation!!.latitude) && favorites[i].longitude == roundOffLatLonDecimal(currentLocation!!.longitude))
                     R.drawable.current_location_marker else R.drawable.favorite_places_marker)
                 )
-            locationsMap?.addMarker(marker)
+            mMap?.addMarker(marker)
             markerList.add(marker)
         }
         for (marker in markerList) {
             builder.include(marker.position)
         }
         val bounds = builder.build()
-        locationsMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150,150,10))
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30))
+        if (favorites.size == 1) mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(favorites.first(), 12f))
     }
 
+    @Suppress("DEPRECATION")
     private fun getAddress(latLng: LatLng): String {
         val geocoder = Geocoder(requireContext())
-        val addresses: List<Address>?
-        val address: Address?
         var addressText = ""
         try {
-            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            if (!addresses.isNullOrEmpty()) {
-                address = addresses[0]
-                for (i in 0 until address.maxAddressLineIndex) {
-                    addressText += if (i == 0) address.getAddressLine(i) else "\n" + address.getAddressLine(i)
-                }
+            val address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)?.firstOrNull()
+            if (address != null) {
+                addressText = address.getAddressLine(0)
             }
         } catch (e: IOException) {
-            Timber.e("Maps Fragment", e.localizedMessage)
+            Timber.e("Location Address", e.localizedMessage)
         }
         return addressText
     }
