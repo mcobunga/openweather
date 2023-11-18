@@ -15,19 +15,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build-OpenWeather:
+  OpenWeather:
     runs-on: ubuntu-latest
     steps:
 
-      # Checkout open weather repo
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      # Set Repository Name As Env Variable
       - name: Set repository name as env variable
         run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
 
-      #Setup project JDK version
       - name: Setup JDK 17
         uses: actions/setup-java@v3
         with:
@@ -35,61 +32,66 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      #
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      #Getting Google Maps API key
       - name: Get key MAPS_API_KEY
         env:
           GOOGLE_MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: echo MAPS_API_KEY=\"MAPS_API_KEY\" > ./local.properties
 
-      #Getting Open Weather API key
       - name: Get key OPEN_WEATHER_API_KEY
         env:
           WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
         run: echo OPEN_WEATHER_API_KEY=\"OPEN_WEATHER_API_KEY\" > ./local.properties
 
-      #Gradle
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      #Run unit tests
-      - name: Run gradle tests
-        run: ./gradlew test --stacktrace
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest
 
-      # Run Build Project
+      - name: Upload Test Reports Folder
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }} # IMPORTANT: Upload reports regardless of status
+        with:
+            name: index.html
+            path: app/build/reports/tests/testDebugUnitTest/index.html # path to where the xml test results are stored
+
+      - name: Android Test Report
+        uses: asadmansr/android-test-report-action@v1.2.0
+        if: ${{ always() }} # IMPORTANT: run Android Test Report regardless
+
       - name: Build gradle project
         run: ./gradlew build
 
-      # Create APK Debug
+
       - name: Build apk debug project (APK) - ${{ env.main_project_module }} module
         run: ./gradlew assembleDebug
 
-      # Create APK Release
+
       - name: Build apk release project (APK) - ${{ env.main_project_module }} module
         run: ./gradlew assemble
 
-      # Create Bundle AAB Release
+
       - name: Build app bundle release (AAB) - ${{ env.main_project_module }} module
         run: ./gradlew ${{ env.main_project_module }}:bundleRelease
 
-      # Upload Artifact Build
+
       - name: Upload APK Debug - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/
 
-      # Noted For Output [main_project_module]/build/outputs/apk/release/
+
       - name: Upload APK Release - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
           path: ${{ env.main_project_module }}/build/outputs/apk/release/
 
-      # Noted For Output [main_project_module]/build/outputs/bundle/release/
+
       - name: Upload AAB (App Bundle) Release - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
