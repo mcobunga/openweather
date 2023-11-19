@@ -1,4 +1,4 @@
-name: OpenWeather Workflows
+name: openweather_build
 
 env:
   main_project_module: app

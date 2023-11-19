@@ -1,4 +1,4 @@
-package com.bonface.openweather.data.local
+package com.bonface.openweather.data
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4

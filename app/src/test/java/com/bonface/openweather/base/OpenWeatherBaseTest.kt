@@ -25,8 +25,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
-@RunWith(AndroidJUnit4::class)
-open class OpenWeatherBaseTest : TestCase() {
+open class OpenWeatherBaseTest  {
 
     lateinit var openWeatherApi: OpenWeatherApi
     private lateinit var database: OpenWeatherDatabase
@@ -40,7 +39,7 @@ open class OpenWeatherBaseTest : TestCase() {
 
 
     @Before
-    public override fun setUp() {
+    public open fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, OpenWeatherDatabase::class.java)
             .setQueryExecutor(dispatcher.asExecutor())
@@ -99,12 +98,5 @@ open class OpenWeatherBaseTest : TestCase() {
     fun enqueueResponse(response: MockResponse) {
         mockWebServer.enqueue(response)
     }
-
-    private fun mockResponse(header: String = "Content-Type: application/json; charset=utf-8", responseCode: Int, responseBody: String?): MockResponse =
-        MockResponse()
-            .addHeader(header)
-            .setResponseCode(responseCode)
-            .setBody(responseBody.orEmpty())
-
 
 }

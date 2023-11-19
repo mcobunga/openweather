@@ -1,4 +1,4 @@
-package com.bonface.openweather.data.local
+package com.bonface.openweather.data
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -13,22 +13,23 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class FavoritePlacesDaoTest: OpenWeatherBaseTest() {
+class WeatherForecastDaoTest: OpenWeatherBaseTest() {
 
     @get: Rule
     val rule = InstantTaskExecutorRule()
 
+
     @Test
-    fun `save favorite place to favorites table and verify`() = runBlocking {
+    fun `save weather forecast to weather forecast table and verify`() = runBlocking {
         //given
-        val favoritePlace = TestCreationUtils.getFavoritePlaces()
+        val weatherForecast = TestCreationUtils.getWeatherForecast()
 
         //when
-        favoritePlacesDao.saveFavoritePlace(favoritePlace.first())
-        val favorites = favoritePlacesDao.getFavoritePlaces().first().toList()
+        weatherForecastDao.saveWeatherWeather(weatherForecast.first())
+        val forecast = weatherForecastDao.getWeatherWeather().first().toList()
 
         //verify
-        MatcherAssert.assertThat(favorites.first().latitude, `is` (favoritePlace.first().latitude))
+        MatcherAssert.assertThat(forecast.first().dayOfWeek, `is` (weatherForecast.first().dayOfWeek))
 
     }
 
