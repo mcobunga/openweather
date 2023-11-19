@@ -45,6 +45,7 @@ class SearchPlacesActivity : AppCompatActivity() {
         customizeSearchView()
         setupSearchAdapter()
         setSearchingStatus()
+
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback())
     }
 
@@ -91,6 +92,9 @@ class SearchPlacesActivity : AppCompatActivity() {
     }
 
     private fun initializePlaces() {
+        if (!Places.isInitialized()) {
+            Places.initialize(this, getString(R.string.maps_api_key))
+        }
         placesClient = Places.createClient(this)
         val autocompleteSessionToken = AutocompleteSessionToken.newInstance()
         searchAdapter = SearchAdapter(autocompleteSessionToken, placesClient)

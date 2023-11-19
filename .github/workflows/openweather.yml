@@ -3,8 +3,6 @@ name: OpenWeather Workflows
 env:
   main_project_module: app
 
-  playstore_name: OpenWeather ID
-
 on:
   pull_request:
   push:
@@ -49,7 +47,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew test --stacktrace
 
       - name: Upload Test Reports Folder
         uses: actions/upload-artifact@v2
