@@ -10,7 +10,6 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-
 }
 
 android {
@@ -77,7 +76,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.test.ext:junit-ktx:1.1.5")
     implementation("androidx.cardview:cardview:1.0.0")
 
     //Lifacycle
@@ -86,6 +84,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation("com.google.ar:core:1.40.0")
     kapt("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 
     //Firebase crashlytics
@@ -100,8 +99,8 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Coroutine Lifecycle Scopes
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
@@ -112,7 +111,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     //Places
     implementation("com.google.android.libraries.places:places:3.3.0")
-
 
     // Dexter (for permissions)
     implementation("com.karumi:dexter:6.2.3")
@@ -151,35 +149,34 @@ dependencies {
 
     //Tests
     testImplementation("junit:junit:4.13.2")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    // Espresso
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
-    androidTestImplementation("androidx.test:runner:1.5.2")
-    androidTestImplementation("androidx.test:core:1.5.0")
-    testImplementation("io.mockk:mockk:1.12.4")
-    testImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.11")
-    testImplementation("android.arch.core:core-testing:1.1.1")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
-    androidTestImplementation("com.android.support:support-annotations:28.0.0")
-    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.5.1")
 
     androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.test:core-ktx:1.5.0")
+    androidTestImplementation("org.robolectric:robolectric:4.11.1")
+
+    // For instrumented tests.
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48.1")
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.48.1")
+
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.11")
+    testImplementation("android.arch.core:core-testing:1.1.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     testImplementation("androidx.arch.core:core-testing:2.2.0")
-    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
-
     testImplementation("org.robolectric:robolectric:4.11.1")
-
-    testImplementation("com.google.truth:truth:1.1.3")
-    androidTestImplementation("com.google.truth:truth:1.1.3")
-
+    testImplementation("com.google.truth:truth:1.1.5")
     testImplementation("androidx.room:room-testing:2.6.0")
 
-    testImplementation("com.google.dagger:hilt-android-testing:2.37")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.37")
+    testImplementation("com.google.dagger:hilt-android-testing:2.48.1")
     kaptTest("com.google.dagger:hilt-android-compiler:2.48.1")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48.1")
 
 }
 
