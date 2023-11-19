@@ -31,14 +31,12 @@ This project has been implemented using a combination of tools and resources, so
     * Github Actions
 
 * Dependencies + Third party libraries
-    * [Kotlin](https://kotlinlang.org/): 
-    * [Jetpack](https://developer.android.com/jetpack)
-    * [Kotlin Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html)
-    * [Dagger Hilt](https://developer.android.com/training/dependency-injection/hilt-android) 
-    * [Retrofit](https://square.github.io/retrofit/)
+    * [Kotlin](https://kotlinlang.org) - Kotlin is a cross-platform, statically typed, general-purpose high-level programming language with type inference
+    * [Android Jetpack](https://developer.android.com/jetpack/getting-started) - Jetpack encompasses a collection of Android libraries that incorporate best practices and provide backwards compatibility in your Android apps.
+    * [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) - Provides concept of suspending function providing a safer and less error-prone abstraction for asynchronous operations
+    * [Dagger Hilt](https://dagger.dev/hilt/) - Hilt provides a standard way to incorporate Dagger dependency injection into an Android application.
+    * [Retrofit](https://github.com/square/retrofit) - A type-safe HTTP client for Android and the JVM
     * [Firebase crashlytics](https://firebase.google.com/docs/crashlytics) Helps you track, prioritize, and fix stability issues that erode your app quality.
-    * [Room persistence library](https://developer.android.com/jetpack/androidx/releases/room) 
-    * [LiveData](https://developer.android.com/topic/libraries/architecture/livedata) 
     * [AndroidX Lifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle)
     * [Google maps](https://developer.android.com/develop/sensors-and-location/location/maps-and-places) - is part of the Google Play services platform and lets you include maps and customized mapping information in your app
     * [Google Places](https://developers.google.com/maps/documentation/places/android-sdk/overview) -  Places SDK for Android allows you to build location-aware apps that respond contextually to the local businesses and other places near the user's device
@@ -62,10 +60,4 @@ This project has been implemented using a combination of tools and resources, so
 
 
 # Screenshots
-
-![](https://user-images.githubusercontent.com/17246592/127883474-fdf83d0c-fd39-4305-992b-36633983fbfc.jpg)
-![](https://user-images.githubusercontent.com/17246592/127883500-612aa0f7-6a41-4aa2-bc8b-9fe858b91ed6.jpg)
-![](https://user-images.githubusercontent.com/17246592/127883510-296329aa-59ec-43fa-ab2a-38e13c750bd0.jpg)
-![](https://user-images.githubusercontent.com/17246592/127883537-7f4ccdd3-d9d2-43c3-af58-d80f233d5e27.jpg)
-
 
