@@ -84,7 +84,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("com.google.ar:core:1.40.0")
     kapt("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 
     //Firebase crashlytics
