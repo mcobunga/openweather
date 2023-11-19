@@ -12,12 +12,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bonface.openweather.data.model.SearchResult
 import com.bonface.openweather.databinding.ItemSearchResultBinding
+import com.bonface.openweather.utils.Constants.TASK_AWAIT
 import com.google.android.gms.tasks.Tasks
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import timber.log.Timber
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class SearchAdapter(
     private val token: AutocompleteSessionToken,
@@ -91,11 +94,10 @@ class SearchAdapter(
             .setQuery(query.toString())
             .setSessionToken(token)
         val searchResult = client.findAutocompletePredictions(autocompletePredictionsRequest.build())
-        try {
-            Tasks.await(searchResult, 60, TimeUnit.SECONDS)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        try { Tasks.await(searchResult, TASK_AWAIT, TimeUnit.SECONDS) }
+        catch (e: ExecutionException) { e.printStackTrace() }
+        catch (e: InterruptedException) { e.printStackTrace() }
+        catch (e: TimeoutException) { e.printStackTrace() }
         locationSuggestionIds.clear()
         locationSuggestions.clear()
         return  if (searchResult.isSuccessful) {
