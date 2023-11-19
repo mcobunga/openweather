@@ -5,12 +5,13 @@ import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.data.local.entity.ForecastEntity
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.WeatherForecast
+import com.bonface.openweather.utils.roundOffLatLonToHalfUp
 
 fun CurrentWeather.toWeatherEntity(): CurrentWeatherEntity = CurrentWeatherEntity(
         id = id!!,
         name = name.toString(),
-        latitude = coord?.lat,
-        longitude = coord?.lon,
+        latitude = roundOffLatLonToHalfUp(coord?.lat!!),
+        longitude = roundOffLatLonToHalfUp(coord.lon!!),
         dt = dt,
         temp = main?.temp,
         maxTemp = main?.tempMax,
@@ -27,8 +28,8 @@ fun WeatherForecast.toDailyForecastEntity(): List<ForecastEntity> {
     daily?.forEach {
         val dailyForecastEntity = ForecastEntity(
             dayOfWeek = it.dt,
-            latitude = lat,
-            longitude = lon,
+            latitude = roundOffLatLonToHalfUp(lat!!),
+            longitude = roundOffLatLonToHalfUp(lon!!),
             maxTemp = it.temp?.max,
             minTemp = it.temp?.min,
             eveTemp = it.temp?.eve,
@@ -47,8 +48,8 @@ fun WeatherForecast.toDailyForecastEntity(): List<ForecastEntity> {
 fun CurrentWeather.toFavoritePlacesEntity(): FavoritePlacesEntity =  FavoritePlacesEntity(
     id = id!!,
     location = name,
-    latitude = coord?.lat,
-    longitude = coord?.lon,
+    latitude = roundOffLatLonToHalfUp(coord?.lat!!),
+    longitude = roundOffLatLonToHalfUp(coord.lon!!),
     temp = main?.temp,
     maxTemp = main?.tempMax,
     minTemp = main?.tempMin,

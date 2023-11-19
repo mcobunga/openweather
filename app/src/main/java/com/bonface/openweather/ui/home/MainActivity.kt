@@ -2,17 +2,14 @@ package com.bonface.openweather.ui.home
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
-import android.view.Window
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
@@ -31,6 +28,7 @@ import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
 import com.bonface.openweather.utils.lastUpdated
+import com.bonface.openweather.utils.onBackPressedCallback
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.showEnableGPSDialog
 import com.bonface.openweather.utils.startActivity
@@ -74,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         setLocationObserver()
         setFloatingButtonController()
         getCachedWeatherInfo()
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback())
     }
 
     override fun onResume() {
@@ -92,18 +91,10 @@ class MainActivity : AppCompatActivity() {
                 adapter = forecastAdapter
                 layoutManager = LinearLayoutManager(this@MainActivity)
             }
-            tapToRefresh.setOnClickListener {
-                refreshWeatherData()
-            }
-            favoritePlaces.setOnClickListener {
-                goToFavorites()
-            }
-            searchPlaces.setOnClickListener {
-                goToSearch()
-            }
-            addFavorite.setOnClickListener {
-                saveToFavoriteLocations()
-            }
+            tapToRefresh.setOnClickListener { refreshWeatherData() }
+            favoritePlaces.setOnClickListener { goToFavorites() }
+            searchPlaces.setOnClickListener { goToSearch() }
+            addFavorite.setOnClickListener { saveToFavoriteLocations() }
         }
     }
 
@@ -234,17 +225,17 @@ class MainActivity : AppCompatActivity() {
             fab.shrink()
             fab.setOnClickListener {
                 isFabsVisible = if (!isFabsVisible!!) {
-                    showFabOptionsClickListener()
+                    showFabOptions()
                     true
                 } else {
-                    hideFabOptionsClickListener()
+                    hideFabOptions()
                     false
                 }
             }
         }
     }
 
-    private fun showFabOptionsClickListener() {
+    private fun showFabOptions() {
         with(binding) {
             favoritePlaces.show()
             if (isWeatherInfoLoaded == true) addFavorite.show() else addFavorite.hide()
@@ -256,7 +247,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun hideFabOptionsClickListener() {
+    private fun hideFabOptions() {
         with(binding) {
             favoritePlaces.hide()
             addFavorite.hide()
@@ -313,6 +304,7 @@ class MainActivity : AppCompatActivity() {
     private fun hideLoading() {
         binding.loadingLayout.gone()
     }
+
 
     companion object {
         private var currentWeather: CurrentWeather? = null

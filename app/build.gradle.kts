@@ -8,6 +8,8 @@ plugins {
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 
 }
 
@@ -85,6 +87,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     kapt("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 
+    //Firebase crashlytics
+    implementation("com.google.firebase:firebase-crashlytics:18.6.0")
+    implementation("com.google.firebase:firebase-analytics:21.5.0")
 
     //Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")

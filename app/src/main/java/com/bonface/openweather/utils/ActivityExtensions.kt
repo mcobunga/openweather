@@ -7,11 +7,13 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.View
 import android.view.Window
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.palette.graphics.Palette
 import com.bonface.openweather.R
 import com.google.android.material.snackbar.Snackbar
 
+@Suppress("DEPRECATION")
 fun Activity.startActivity(intent: () -> Intent) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val options = ActivityOptions.makeCustomAnimation(this, R.anim.slide_from_right, R.anim.slide_to_left)
@@ -36,5 +38,13 @@ fun Activity.updateStatusBarColor(resource: Int) {
                 window.statusBarColor = dominantSwatch.rgb
             }
         }
+    }
+}
+
+fun Activity.onBackPressedCallback() = object : OnBackPressedCallback(true) {
+    @Suppress("DEPRECATION")
+    override fun handleOnBackPressed() {
+        finish()
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 }

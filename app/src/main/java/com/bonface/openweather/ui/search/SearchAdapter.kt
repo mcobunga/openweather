@@ -24,6 +24,9 @@ class SearchAdapter(
     private val client: PlacesClient
 ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>(), Filterable {
 
+    private val locationSuggestions: ArrayList<SearchResult> = ArrayList()
+    private val locationSuggestionIds: ArrayList<String> = ArrayList()
+
     inner class ViewHolder(val binding: ItemSearchResultBinding) : RecyclerView.ViewHolder(binding.root)
 
     private val diffUtil = object : DiffUtil.ItemCallback<SearchResult>() {
@@ -84,7 +87,6 @@ class SearchAdapter(
     }
 
     private fun searchLocation(query: CharSequence): ArrayList<SearchResult>? {
-        val locationSuggestions: ArrayList<SearchResult> = ArrayList()
         val autocompletePredictionsRequest = FindAutocompletePredictionsRequest.builder()
             .setQuery(query.toString())
             .setSessionToken(token)
@@ -94,13 +96,15 @@ class SearchAdapter(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        locationSuggestionIds.clear()
+        locationSuggestions.clear()
         return  if (searchResult.isSuccessful) {
             searchResult.result.autocompletePredictions.forEach {
+                locationSuggestionIds.add(it.placeId)
                 locationSuggestions.add(SearchResult(it.getPrimaryText(null).toString(), it.getSecondaryText(null).toString()))
             }
             locationSuggestions
         } else null
-
     }
 
     private var _isSearching: MutableLiveData<Boolean> = MutableLiveData()

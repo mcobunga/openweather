@@ -18,7 +18,7 @@ import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
-import com.bonface.openweather.utils.roundOffLatLonDecimal
+import com.bonface.openweather.utils.roundOffLatLonToHalfUp
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.snackbar
 import com.bonface.openweather.utils.startActivity
@@ -84,13 +84,13 @@ class FavoritePlacesFragment : Fragment() {
     private fun setAdapterData(location: Location?, places: List<FavoritePlacesEntity>) {
         if (places.isNotEmpty()) {
             places.forEach {
-                if (location != null && (roundOffLatLonDecimal(location.latitude) == it.latitude && roundOffLatLonDecimal(location.longitude) == it.longitude)) {
+                if (location != null && (roundOffLatLonToHalfUp(location.latitude) == it.latitude && roundOffLatLonToHalfUp(location.longitude) == it.longitude)) {
                     it.isCurrentLocation = true
                 }
             }
             for (i in 0 until places.toMutableList().size) {
                 if (places[i].isCurrentLocation == true) {
-                    Collections.rotate(places, i)
+                    Collections.swap(places, 0, i)
                 }
             }
             placesListAdapter.differ.submitList(places)

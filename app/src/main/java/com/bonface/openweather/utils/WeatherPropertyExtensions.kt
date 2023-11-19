@@ -1,8 +1,8 @@
 package com.bonface.openweather.utils
 
 import com.bonface.openweather.R
+import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 fun getTemperature(temp: Double?): String {
@@ -21,10 +21,9 @@ fun getForecastWeatherIcon(weatherId: Int?): Int {
     return forecastWeatherIcon(weatherId.toString())
 }
 
-fun roundOffLatLonDecimal(number: Double): Double {
-    val df = DecimalFormat("#.###")
-    df.roundingMode = RoundingMode.CEILING
-    return df.format(number).toDouble()
+fun roundOffLatLonToHalfUp(number: Double): Double {
+    val bigDecimal = BigDecimal(number)
+    return bigDecimal.setScale(3, RoundingMode.HALF_UP).toDouble()
 }
 
 private fun currentWeatherImage(id: String): Int {

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
+import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.SearchResult
 import com.bonface.openweather.databinding.ActivitySearchPlacesBinding
 import com.bonface.openweather.ui.searchResult.SEARCHED_LOCATION_WEATHER_BOTTOM_SHEET
@@ -17,6 +18,7 @@ import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.Resource
 import com.bonface.openweather.utils.gone
 import com.bonface.openweather.utils.hideKeyboard
+import com.bonface.openweather.utils.onBackPressedCallback
 import com.bonface.openweather.utils.show
 import com.bonface.openweather.utils.showKeyboard
 import com.bonface.openweather.utils.toast
@@ -43,6 +45,7 @@ class SearchPlacesActivity : AppCompatActivity() {
         customizeSearchView()
         setupSearchAdapter()
         setSearchingStatus()
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback())
     }
 
     private fun setTextChangeListener() {
@@ -82,7 +85,7 @@ class SearchPlacesActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context)
         }
         searchAdapter.onSearchItemClicked {
-            geoCodeAddress(it)
+            getLocationGeoCode(it)
             hideKeyboard(binding.discoverPlacesEditText)
         }
     }
@@ -98,10 +101,7 @@ class SearchPlacesActivity : AppCompatActivity() {
             when (resource) {
                 is Resource.Success -> {
                     hideLoading()
-                    resource.data?.let { weather ->
-                        weatherViewModel.setBottomSheetWeather(listOf(weather))
-                        SearchedLocationWeatherBottomSheet(weather).show(supportFragmentManager, SEARCHED_LOCATION_WEATHER_BOTTOM_SHEET)
-                    }
+                    resource.data?.let { showBottomSheet(it) }
                 }
                 is Resource.Error -> {
                     hideLoading()
@@ -118,7 +118,14 @@ class SearchPlacesActivity : AppCompatActivity() {
         weatherViewModel.getCurrentWeatherFromRemote(location)
     }
 
-    private fun geoCodeAddress(searchResult: SearchResult) {
+    private fun showBottomSheet(weather: CurrentWeather) {
+        val bottomSheet = SearchedLocationWeatherBottomSheet(weather)
+        if (!bottomSheet.isVisible) {
+            bottomSheet.show(supportFragmentManager, SEARCHED_LOCATION_WEATHER_BOTTOM_SHEET)
+        }
+    }
+
+    private fun getLocationGeoCode(searchResult: SearchResult) {
         try {
             val address = Geocoder(this).getFromLocationName("${searchResult.primaryText}, ${searchResult.secondaryText}", 1)?.firstOrNull()
             if (address != null) {
@@ -149,13 +156,6 @@ class SearchPlacesActivity : AppCompatActivity() {
 
     private fun hideLoading() {
         binding.loadingLayout.gone()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
-        finish()
     }
 
 }

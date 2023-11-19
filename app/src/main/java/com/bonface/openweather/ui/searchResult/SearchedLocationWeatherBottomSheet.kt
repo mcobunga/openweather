@@ -29,7 +29,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
-
 const val SEARCHED_LOCATION_WEATHER_BOTTOM_SHEET = "SearchedLocationWeatherBottomSheet"
 const val LOCATION_WEATHER_INFO = "location_weather"
 
@@ -59,6 +58,7 @@ class SearchedLocationWeatherBottomSheet : BottomSheetDialogFragment() {
                     .from(bottomSheet)
                     .setState(BottomSheetBehavior.STATE_EXPANDED)
             }
+            setCanceledOnTouchOutside(false)
         }
 
     override fun onCreateView(
@@ -77,25 +77,16 @@ class SearchedLocationWeatherBottomSheet : BottomSheetDialogFragment() {
         arguments?.apply {
             currentWeather = getParcelable(LOCATION_WEATHER_INFO)
         }
-        initObservers()
         setButtonListener()
+        setViews()
+    }
+
+    private fun setViews() {
         val weather = currentWeather?.toWeatherEntity()
         if (weather != null) {
             updateWeatherViews(weather)
         } else {
             dismiss()
-        }
-    }
-
-    private fun initObservers(){
-        weatherViewModel.searchResultWeather.observe(viewLifecycleOwner) { result ->
-            val weather = result?.firstOrNull()?.toWeatherEntity()
-            if (weather != null) {
-                currentWeather = result.firstOrNull()
-                updateWeatherViews(weather)
-            } else {
-                dismiss()
-            }
         }
     }
 
@@ -122,6 +113,15 @@ class SearchedLocationWeatherBottomSheet : BottomSheetDialogFragment() {
             activity?.toast(getString(R.string.add_to_favorites_success_message))
             dismiss()
         }
+        binding.close.setOnClickListener {
+            dismiss()
+        }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 
 }
