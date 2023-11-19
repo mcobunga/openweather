@@ -28,7 +28,7 @@
     <string name="no_internet_connection">No internet connection, try again</string>
     <string name="app_update_needed">You need to update the app and try again</string>
     <string name="problem_processing_request">There was a problem processing your request. Please try again</string>
-    <string name="unable_to_connect">Unable to connect, check your connection</string>
+    <string name="unable_to_connect">Network is unreachable, check your connection</string>
     <string name="internal_server_error">Internal server error, try again later.</string>
     <string name="service_unavailable">Service temporarily unavailable, try again later</string>
     <string name="no_server_response">There was a problem completing your request. Try again later.</string>
@@ -46,4 +46,5 @@
     <string name="fetching_weather">Getting weather info for %1$s</string>
     <string name="bottom_sheet_title">Current Weather For %1$s</string>
     <string name="bottom_sheet_button_text">Save to favorites</string>
+    <string name="exit_message">Press back again to exit</string>
 </resources>

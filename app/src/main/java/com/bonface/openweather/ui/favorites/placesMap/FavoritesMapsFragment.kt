@@ -18,7 +18,7 @@ import com.bonface.openweather.ui.viewmodel.WeatherViewModel
 import com.bonface.openweather.utils.bitmapDescriptorFromVector
 import com.bonface.openweather.utils.isAccessFineLocationGranted
 import com.bonface.openweather.utils.isLocationEnabled
-import com.bonface.openweather.utils.roundOffLatLonDecimal
+import com.bonface.openweather.utils.roundOffLatLonToHalfUp
 import com.bonface.openweather.utils.showEnableGPSDialog
 import com.bonface.openweather.utils.toast
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -86,7 +86,7 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
     private fun getFavoritePlaces(location: Location) {
         lifecycleScope.launch {
             weatherViewModel.getFavoritePlaces().collect { favorites ->
-                val currentLatLng = LatLng(roundOffLatLonDecimal(location.latitude), roundOffLatLonDecimal(location.longitude))
+                val currentLatLng = LatLng(roundOffLatLonToHalfUp(location.latitude), roundOffLatLonToHalfUp(location.longitude))
                 favoriteLocations.clear()
                 favoriteLocations.add(currentLatLng)
                 setLocations(favorites)
@@ -125,7 +125,7 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
                 .position(favorites[i])
                 .title(titleStr)
                 .icon(bitmapDescriptorFromVector(requireContext(),
-                    if(favorites[i].latitude == roundOffLatLonDecimal(currentLocation!!.latitude) && favorites[i].longitude == roundOffLatLonDecimal(currentLocation!!.longitude))
+                    if(favorites[i].latitude == roundOffLatLonToHalfUp(currentLocation!!.latitude) && favorites[i].longitude == roundOffLatLonToHalfUp(currentLocation!!.longitude))
                     R.drawable.current_location_marker else R.drawable.favorite_places_marker)
                 )
             mMap?.addMarker(marker)
@@ -135,7 +135,12 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
             builder.include(marker.position)
         }
         val bounds = builder.build()
-        mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30))
+
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+        val padding = (width * 0.1).toInt()
+
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding))
         if (favorites.size == 1) mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(favorites.first(), 12f))
     }
 

@@ -14,7 +14,7 @@ import com.bonface.openweather.repository.WeatherRepository
 import com.bonface.openweather.utils.ErrorHandler
 import com.bonface.openweather.utils.LocationProvider
 import com.bonface.openweather.utils.Resource
-import com.bonface.openweather.utils.roundOffLatLonDecimal
+import com.bonface.openweather.utils.roundOffLatLonToHalfUp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -32,7 +32,6 @@ class WeatherViewModel @Inject constructor(
     private val _forecast = MutableLiveData<Resource<WeatherForecast>>()
     private var _currentLocation: MutableLiveData<Location> = MutableLiveData()
     private var _isExists: MutableLiveData<Boolean> = MutableLiveData()
-    private val searchedLocation = MutableLiveData<List<CurrentWeather>?>()
 
     val currentWeather: LiveData<Resource<CurrentWeather>>
         get() = _current
@@ -43,7 +42,6 @@ class WeatherViewModel @Inject constructor(
         get() = _currentLocation
     val isExists: LiveData<Boolean>
         get() = _isExists
-    val searchResultWeather: LiveData<List<CurrentWeather>?> = searchedLocation
 
     fun getCurrentWeatherFromRemote(location: Location) {
         _current.postValue(Resource.Loading())
@@ -104,7 +102,7 @@ class WeatherViewModel @Inject constructor(
 
     fun isLocationAlreadyExists(location: Location) = viewModelScope.launch(Dispatchers.IO) {
         try {
-            weatherRepository.isLocationAlreadyExists(roundOffLatLonDecimal(location.latitude), roundOffLatLonDecimal(location.longitude)).apply {
+            weatherRepository.isLocationAlreadyExists(roundOffLatLonToHalfUp(location.latitude), roundOffLatLonToHalfUp(location.longitude)).apply {
                 _isExists.postValue(this)
             }
         } catch (e: Exception) {
@@ -137,10 +135,5 @@ class WeatherViewModel @Inject constructor(
             cancel()
         }
     }
-
-    fun setBottomSheetWeather(weather: List<CurrentWeather>?){
-        searchedLocation.value = weather
-    }
-
 
 }
