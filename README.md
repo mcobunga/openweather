@@ -25,10 +25,8 @@ The application also supports offline viewing of saved weather information.
 ## OpenWeather Tech stack
 
 This project has been implemented using a combination of tools and resources, some of which are;
-* Architecture of choice
-    * MVVM - Model View View Model
-* CI/CD - Continuous Integration and Continuous Delivery
-    * Github Actions
+* Architecture of choice: MVVM - Model View View Model
+* CI/CD - Continuous Integration and Continuous Delivery: Github Actions
 
 * Dependencies + Third party libraries
     * [Kotlin](https://kotlinlang.org) - Kotlin is a cross-platform, statically typed, general-purpose high-level programming language with type inference
@@ -53,11 +51,40 @@ This project has been implemented using a combination of tools and resources, so
     * [MockK](https://mockk.io) - Supports regular unit tests allowing you to mock objects.
     * [Google Truth](https://github.com/google/truth) - Fluent assertions for Java and Android
 
-   
-
-
 
 
 
 # Screenshots
+
+<p align="center">
+<img width="40%" alt="Screenshot 2023-10-18 at 09 59 42" src="https://github.com/mcobunga/openweather/assets/25502580/65bfa9b8-09c7-474e-8433-ae321bf79e28" style="centre">
+</p>
+
+
+<p align="center">
+<img width="40%" alt="Screenshot 2023-10-18 at 14 02 38" src="https://github.com/mcobunga/openweather/assets/25502580/92d26033-a9cb-46a0-aa31-0877cd44d36f">
+</p>
+
+
+<p align="center">
+<img width="40%" alt="Screenshot 2023-10-18 at 09 59 42" src="https://github.com/mcobunga/openweather/assets/25502580/dd002e05-0850-4f70-8b54-220f98e50292" style="centre">
+</p>
+
+
+<p align="center">
+<img width="40%" alt="Screenshot 2023-10-18 at 11 27 07" src="https://github.com/mcobunga/openweather/assets/25502580/063d53cd-df55-4157-848b-284a934f518f">
+</p>
+
+
+<p align="center">
+<img width="40%" alt="Screenshot 2023-10-18 at 11 27 37" src="https://github.com/mcobunga/openweather/assets/25502580/7f568f1f-0e52-4988-85e2-8946b204dad0">
+</p>
+
+
+
+
+
+
+
+
 
