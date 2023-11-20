@@ -95,7 +95,10 @@ class FavoritePlacesFragment : Fragment() {
             }
             placesListAdapter.differ.submitList(places)
             hideLoading()
-        } else snackbar(binding.favoritesLayout, getString(R.string.empty_favorites_message))
+        } else {
+            showEmptyState()
+            snackbar(binding.favoritesLayout, getString(R.string.empty_favorites_message))
+        }
     }
 
     private fun setupAdapter() {
@@ -113,6 +116,14 @@ class FavoritePlacesFragment : Fragment() {
 
     private fun hideLoading() {
         binding.loadingLayout.gone()
+    }
+
+    private fun showEmptyState() {
+        with(binding) {
+            loadingLayout.show()
+            loadingProgressbar.gone()
+            emptyState.show()
+        }
     }
 
     override fun onDestroyView() {

@@ -121,7 +121,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun getCachedWeatherInfo() {
         lifecycleScope.launch {
             weatherViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
@@ -146,15 +145,10 @@ class MainActivity : AppCompatActivity() {
             when (resource) {
                 is Resource.Success -> {
                     hideLoading()
-                    resource.data?.let { weather ->
-                        weatherViewModel.deleteCurrentWeatherFromDb().invokeOnCompletion {
-                            weatherViewModel.saveCurrentWeatherToDb(weather)
-                        }
-                    }
-                    currentWeather = resource.data
+                    saveCurrentWeather(resource.data)
                 }
                 is Resource.Error -> {
-                    hideLoading()
+                    if (isWeatherInfoLoaded == true) hideLoading()
                     showSnackbarErrorMessage(resource.message.toString())
                 }
                 is Resource.Loading -> {
@@ -163,6 +157,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
         weatherViewModel.getCurrentWeatherFromRemote(location)
+    }
+
+    private fun saveCurrentWeather(data: CurrentWeather?) {
+        data?.let { weather ->
+            weatherViewModel.deleteCurrentWeatherFromDb().invokeOnCompletion {
+                weatherViewModel.saveCurrentWeatherToDb(weather)
+            }
+        }
+        currentWeather = data
     }
 
     private fun getWeatherForecastFromRemote(location: Location) {
@@ -199,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSnackbarErrorMessage(message: String) {
         binding.weatherLayout.apply {
-            val snack = Snackbar.make(this, message, Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.try_again)) {
+            val snack = Snackbar.make(this, message, Snackbar.LENGTH_LONG).setAction(getString(R.string.try_again)) {
                 refreshWeatherData()
             }
             val button = snack.view.findViewById(com.google.android.material.R.id.snackbar_action) as TextView
