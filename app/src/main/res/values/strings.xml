@@ -36,7 +36,7 @@
 
     <!--  Permissions error response  -->
     <string name="you_need_to_allow_location_permission">You need to allow location permission</string>
-    <string name="enable_location_permissions">Enable location permissions</string>
+    <string name="enable_location_permissions">Enable location permissions or check your internet connection</string>
 
     <!--  db error response  -->
     <string name="add_to_favorites_success_message">Successfully added to favorites</string>
