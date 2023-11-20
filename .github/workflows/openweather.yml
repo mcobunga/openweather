@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload Test Reports Folder
         uses: actions/upload-artifact@v2
-        if: ${{ always() }} # IMPORTANT: Upload reports regardless of status
+        if: ${{ always() }} # Upload reports regardless of status
         with:
             name: index.html
             path: app/build/reports/tests/testDebugUnitTest/index.html # path to where the xml test results are stored
@@ -63,28 +63,15 @@ jobs:
       - name: Build gradle project
         run: ./gradlew build
 
-
-      - name: Sign app APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_app
-        with:
-            releaseDirectory: app/build/outputs/apk/release
-            signingKeyBase64: ${{ secrets.KEYSTORE }}
-            alias: ${{ secrets.SIGNING_KEY_ALIAS }}
-            keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
-            keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "30.0.2"
-
-      - name: Build apk debug project (APK) - ${{ env.main_project_module }} module
+      - name: Build apk debug project
         run: ./gradlew assembleDebug
 
 
-      - name: Build apk release project (APK) - ${{ env.main_project_module }} module
+      - name: Build apk release project
         run: ./gradlew assemble
 
 
-      - name: Build app bundle release (AAB) - ${{ env.main_project_module }} module
+      - name: Build app bundle release
         run: ./gradlew ${{ env.main_project_module }}:bundleRelease
 
 
