@@ -53,7 +53,7 @@ android {
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
             .forEach { output ->
-                val outputFileName = "openweather_${variant.baseName}_${variant.versionName} ${variant.versionCode}.apk"
+                val outputFileName = "openweather_${variant.baseName}_${variant.versionName}_${variant.versionCode}.apk"
                 output.outputFileName = outputFileName
             }
     }
