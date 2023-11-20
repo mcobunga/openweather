@@ -121,7 +121,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun getCachedWeatherInfo() {
         lifecycleScope.launch {
             weatherViewModel.getCurrentWeatherFromDb().collect { currentWeather ->
@@ -146,15 +145,10 @@ class MainActivity : AppCompatActivity() {
             when (resource) {
                 is Resource.Success -> {
                     hideLoading()
-                    resource.data?.let { weather ->
-                        weatherViewModel.deleteCurrentWeatherFromDb().invokeOnCompletion {
-                            weatherViewModel.saveCurrentWeatherToDb(weather)
-                        }
-                    }
-                    currentWeather = resource.data
+                    saveCurrentWeather(resource.data)
                 }
                 is Resource.Error -> {
-                    hideLoading()
+                    if (isWeatherInfoLoaded == true) hideLoading()
                     showSnackbarErrorMessage(resource.message.toString())
                 }
                 is Resource.Loading -> {
@@ -163,6 +157,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
         weatherViewModel.getCurrentWeatherFromRemote(location)
+    }
+
+    private fun saveCurrentWeather(data: CurrentWeather?) {
+        data?.let { weather ->
+            weatherViewModel.deleteCurrentWeatherFromDb().invokeOnCompletion {
+                weatherViewModel.saveCurrentWeatherToDb(weather)
+            }
+        }
+        currentWeather = data
     }
 
     private fun getWeatherForecastFromRemote(location: Location) {
