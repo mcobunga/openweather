@@ -33,14 +33,15 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Create Local Properties File
-        run: touch local.properties
+      - name: Get MAPS_API_KEY
+        env:
+          MAPS_API_KEY: $
+        run: echo MAPS_API_KEY=\"$MAPS_API_KEY\" > ./local.properties
 
-      - name: Get key MAPS_API_KEY
-        run: echo "MAPS_API_KEY=\""${{ secrets.MAPS_API_KEY }}"\"" >> local.properties
-
-      - name: Get key OPEN_WEATHER_API_KEY
-        run: echo "OPEN_WEATHER_API_KEY=\""${{ secrets.MAPS_API_KEY }}"\"" >> local.properties
+      - name: Get OPEN_WEATHER_API_KEY
+        env:
+          OPEN_WEATHER_API_KEY: $
+        run: echo OPEN_WEATHER_API_KEY=\"$OPEN_WEATHER_API_KEY\" > ./local.properties
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
