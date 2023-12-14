@@ -1,6 +1,7 @@
 package com.bonface.openweather.data.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
@@ -8,6 +9,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Keep
 @JsonClass(generateAdapter = true)
 @Parcelize
 data class CurrentWeather(

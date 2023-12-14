@@ -10,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.FavoritePlacesEntity
 import com.bonface.openweather.databinding.FragmentFavoritesMapsBinding
@@ -75,11 +77,15 @@ class FavoritesMapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarker
 
     @SuppressLint("MissingPermission")
     private fun setLocationObserver() {
-        weatherViewModel.currentLocation.observe(viewLifecycleOwner) {
-            currentLocation = it
-            mMap?.isMyLocationEnabled = true
-            mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
-            getFavoritePlaces(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                weatherViewModel.currentLocation.collect { location ->
+                    currentLocation = location
+                    mMap?.isMyLocationEnabled = true
+                    mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+                    location?.let { getFavoritePlaces(it) }
+                }
+            }
         }
     }
 

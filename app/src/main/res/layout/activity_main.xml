@@ -85,6 +85,31 @@
             app:tint="@color/white"
             android:contentDescription="@string/weather_icon_desc" />
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/mark_favorite"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:tint="@color/purple_200"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/baseline_favorite_border_24"
+            app:layout_constraintEnd_toStartOf="@+id/search_locations"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/search_locations"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:tint="@color/purple_200"
+            app:srcCompat="@drawable/baseline_search_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.textview.MaterialTextView
@@ -187,6 +212,7 @@
         android:id="@+id/loading_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:background="@color/white">
 
         <ProgressBar

@@ -33,14 +33,15 @@ android {
         }
 
         buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL", "")}\"")
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${properties.getProperty("OPEN_WEATHER_API_KEY", "")}\"")
         manifestPlaceholders["MAPS_API_KEY"] = properties.getProperty("MAPS_API_KEY", "")
-        resValue("string", "open_weather_api_key", properties.getProperty("OPEN_WEATHER_API_KEY", ""))
-        resValue("string", "maps_api_key", properties.getProperty("MAPS_API_KEY", ""))
     }
 
     buildTypes {
         release {
-            isDebuggable = false
+            isDebuggable = true
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

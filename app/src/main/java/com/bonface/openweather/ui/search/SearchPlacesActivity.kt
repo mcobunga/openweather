@@ -7,7 +7,11 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bonface.openweather.BuildConfig.MAPS_API_KEY
 import com.bonface.openweather.R
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.SearchResult
@@ -26,6 +30,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 @Suppress("DEPRECATION")
@@ -93,7 +98,7 @@ class SearchPlacesActivity : AppCompatActivity() {
 
     private fun initializePlaces() {
         if (!Places.isInitialized()) {
-            Places.initialize(this, getString(R.string.maps_api_key))
+            Places.initialize(this, MAPS_API_KEY)
         }
         placesClient = Places.createClient(this)
         val autocompleteSessionToken = AutocompleteSessionToken.newInstance()
@@ -101,21 +106,25 @@ class SearchPlacesActivity : AppCompatActivity() {
     }
 
     private fun getCurrentWeatherForSelectedLocation(location: Location, searchResult: SearchResult) {
-        weatherViewModel.currentWeather.observe(this) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    hideLoading()
-                    resource.data?.let { showBottomSheet(it) }
-                }
-                is Resource.Error -> {
-                    hideLoading()
-                    toast(resource.message.toString())
-                }
-                is Resource.Loading -> {
-                    binding.emptyState.apply {
-                        text = getString(R.string.fetching_weather, searchResult.primaryText)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                weatherViewModel.currentWeather.collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            hideLoading()
+                            resource.data?.let { showBottomSheet(it) }
+                        }
+                        is Resource.Error -> {
+                            hideLoading()
+                            toast(resource.message.toString())
+                        }
+                        is Resource.Loading -> {
+                            binding.emptyState.apply {
+                                text = getString(R.string.fetching_weather, searchResult.primaryText)
+                            }
+                            showLoading()
+                        }
                     }
-                    showLoading()
                 }
             }
         }

@@ -2,8 +2,6 @@
     <string name="app_name">OpenWeather</string>
     <string name="enable_gps">Enable GPS</string>
     <string name="enable_now">Enable Now</string>
-    <string name="open_weather_api_key"></string>
-    <string name="maps_api_key"></string>
     <string name="gps_desc">Enable GPS to find your current location.</string>
     <string name="min">min</string>
     <string name="current">Current</string>
@@ -48,4 +46,7 @@
     <string name="bottom_sheet_title">Current Weather For %1$s</string>
     <string name="bottom_sheet_button_text">Save to favorites</string>
     <string name="exit_message">Press back again to exit</string>
+
+    <string name="favorites_list">Favorites List</string>
+    <string name="favorites_map">Favorites Map</string>
 </resources>

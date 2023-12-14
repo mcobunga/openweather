@@ -2,6 +2,7 @@ package com.bonface.openweather.ui.home
 
 import android.Manifest
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.location.Location
 import android.os.Bundle
 import android.widget.TextView
@@ -9,7 +10,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonface.openweather.R
 import com.bonface.openweather.data.local.entity.CurrentWeatherEntity
@@ -95,6 +98,8 @@ class MainActivity : AppCompatActivity() {
             favoritePlaces.setOnClickListener { goToFavorites() }
             searchPlaces.setOnClickListener { goToSearch() }
             addFavorite.setOnClickListener { saveToFavoriteLocations() }
+            searchLocations.setOnClickListener { goToSearch() }
+            markFavorite.setOnClickListener { saveToFavoriteLocations() }
         }
     }
 
@@ -112,11 +117,15 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setLocationObserver() {
-        weatherViewModel.currentLocation.observe(this@MainActivity) {
-            location = it
-            it?.let { location ->
-                getCurrentWeatherFromRemote(location)
-                getWeatherForecastFromRemote(location)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                weatherViewModel.currentLocation.collect {
+                    location = it
+                    it?.let { location ->
+                        getCurrentWeatherFromRemote(location)
+                        getWeatherForecastFromRemote(location)
+                    }
+                }
             }
         }
     }
@@ -141,18 +150,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrentWeatherFromRemote(location: Location) {
-        weatherViewModel.currentWeather.observe(this) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    hideLoading()
-                    saveCurrentWeather(resource.data)
-                }
-                is Resource.Error -> {
-                    if (isWeatherInfoLoaded == true) hideLoading()
-                    showSnackbarErrorMessage(resource.message.toString())
-                }
-                is Resource.Loading -> {
-                    showLoading()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                weatherViewModel.currentWeather.collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            hideLoading()
+                            saveCurrentWeather(resource.data)
+                        }
+                        is Resource.Error -> {
+                            if (isWeatherInfoLoaded == true) hideLoading()
+                            showSnackbarErrorMessage(resource.message.toString())
+                        }
+                        is Resource.Loading -> {
+                            showLoading()
+                        }
+                    }
                 }
             }
         }
@@ -169,15 +182,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getWeatherForecastFromRemote(location: Location) {
-        weatherViewModel.forecastWeather.observe(this) { resource ->
-            when (resource) {
-                is Resource.Success -> resource.data?.let { forecast ->
-                    weatherViewModel.deleteWeatherForecast().invokeOnCompletion {
-                        weatherViewModel.saveWeatherForecastToDb(forecast)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                weatherViewModel.forecastWeather.collect { resource ->
+                    when (resource) {
+                        is Resource.Success -> resource.data?.let { forecast ->
+                            weatherViewModel.deleteWeatherForecast().invokeOnCompletion {
+                                weatherViewModel.saveWeatherForecastToDb(forecast)
+                            }
+                        }
+                        is Resource.Error -> showSnackbarErrorMessage(resource.message.toString())
+                        is Resource.Loading ->{} //nothing - applying progressbar to only current weather api call
                     }
                 }
-                is Resource.Error -> showSnackbarErrorMessage(resource.message.toString())
-                is Resource.Loading ->{} //nothing - applying progressbar to only current weather api call
             }
         }
         weatherViewModel.getWeatherForecastFromRemote(location)
@@ -282,11 +299,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveToFavoriteLocations() {
         if (location != null) {
-            weatherViewModel.isExists.observe(this) { exists ->
-                if (!exists) {
-                    currentWeather?.let { weatherViewModel.saveLocationToFavorites(it) }
-                    toast(getString(R.string.add_to_favorites_success_message))
-                } else toast(getString(R.string.already_exists_in_favorites_message))
+            lifecycleScope.launch {
+                weatherViewModel.isExists.collect { exists ->
+                    if (exists == false) {
+                        currentWeather?.let { weatherViewModel.saveLocationToFavorites(it) }
+                        binding.markFavorite.apply {
+                            show()
+                            setImageResource(R.drawable.baseline_favorite_24)
+                            imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.purple_200))
+                        }
+                        toast(getString(R.string.add_to_favorites_success_message))
+                    } else toast(getString(R.string.already_exists_in_favorites_message))
+                }
             }
             weatherViewModel.isLocationAlreadyExists(location!!)
         }

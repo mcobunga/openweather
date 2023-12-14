@@ -81,7 +81,7 @@ class SearchAdapter(
         @SuppressLint("NotifyDataSetChanged")
         @Suppress("UNCHECKED_CAST")
         override fun publishResults(constraint: CharSequence?, filterResults: FilterResults?) {
-            if (filterResults != null) {
+            if (filterResults?.values != null) {
                 differ.submitList(filterResults.values as MutableList<SearchResult>)
                 Timber.e("Published locations: ${filterResults.values}")
                 notifyDataSetChanged()

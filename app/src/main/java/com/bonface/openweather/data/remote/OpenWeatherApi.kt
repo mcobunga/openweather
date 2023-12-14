@@ -10,16 +10,16 @@ interface OpenWeatherApi {
 
     @GET("data/2.5/weather")
     suspend fun getCurrentLocationWeather(
-        @Query("lat") latitude: String,
-        @Query("lon") longitude: String,
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
         @Query("units") units: String,
         @Query("appid") appId: String
     ): Response<CurrentWeather>
 
     @GET("data/2.5/onecall")
     suspend fun getCurrentLocationWeatherForecast(
-        @Query("lat") latitude: String,
-        @Query("lon") longitude: String,
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
         @Query("units") units: String,
         @Query("appid") appId: String,
         @Query("exclude") exclude: String

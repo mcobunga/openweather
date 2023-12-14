@@ -1,17 +1,15 @@
 package com.bonface.openweather.di
 
-import android.content.Context
 import android.os.Environment
 import com.bonface.openweather.BuildConfig
-import com.bonface.openweather.R
+import com.bonface.openweather.BuildConfig.BASE_URL
+import com.bonface.openweather.BuildConfig.OPEN_WEATHER_API_KEY
 import com.bonface.openweather.data.remote.OpenWeatherApi
-import com.bonface.openweather.utils.Constants.BASE_URL
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -54,7 +52,7 @@ object NetworkModule {
     @Provides
     @OpenWeatherApiKey
     @Singleton
-    fun provideOpenWeatherApiKey(@ApplicationContext context: Context): String = context.getString(R.string.open_weather_api_key)
+    fun provideOpenWeatherApiKey(): String = OPEN_WEATHER_API_KEY
 
     @Provides
     @Singleton
