@@ -48,4 +48,7 @@
     <string name="bottom_sheet_title">Current Weather For %1$s</string>
     <string name="bottom_sheet_button_text">Save to favorites</string>
     <string name="exit_message">Press back again to exit</string>
+
+    <string name="favorites_list">Favorites List</string>
+    <string name="favorites_map">Favorites Map</string>
 </resources>

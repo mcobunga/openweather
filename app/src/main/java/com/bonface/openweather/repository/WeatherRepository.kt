@@ -25,8 +25,8 @@ class WeatherRepository @Inject constructor(
 
     suspend fun getCurrentLocationWeather(location: Location): Response<CurrentWeather> {
         return openWeatherApi.getCurrentLocationWeather(
-            location.latitude.toString(),
-            location.longitude.toString(),
+            location.latitude,
+            location.longitude,
             units = Constants.UNITS,
             appId = apiKey
         )
@@ -35,8 +35,8 @@ class WeatherRepository @Inject constructor(
 
     suspend fun getCurrentLocationWeatherForecast(location: Location): Response<WeatherForecast> {
         return openWeatherApi.getCurrentLocationWeatherForecast(
-            location.latitude.toString(),
-            location.longitude.toString(),
+            location.latitude,
+            location.longitude,
             units = Constants.UNITS,
             appId = apiKey,
             exclude = Constants.EXCLUDE
