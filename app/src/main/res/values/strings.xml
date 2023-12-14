@@ -2,8 +2,6 @@
     <string name="app_name">OpenWeather</string>
     <string name="enable_gps">Enable GPS</string>
     <string name="enable_now">Enable Now</string>
-    <string name="open_weather_api_key"></string>
-    <string name="maps_api_key"></string>
     <string name="gps_desc">Enable GPS to find your current location.</string>
     <string name="min">min</string>
     <string name="current">Current</string>

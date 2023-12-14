@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bonface.openweather.BuildConfig.MAPS_API_KEY
 import com.bonface.openweather.R
 import com.bonface.openweather.data.model.CurrentWeather
 import com.bonface.openweather.data.model.SearchResult
@@ -97,7 +98,7 @@ class SearchPlacesActivity : AppCompatActivity() {
 
     private fun initializePlaces() {
         if (!Places.isInitialized()) {
-            Places.initialize(this, getString(R.string.maps_api_key))
+            Places.initialize(this, MAPS_API_KEY)
         }
         placesClient = Places.createClient(this)
         val autocompleteSessionToken = AutocompleteSessionToken.newInstance()
