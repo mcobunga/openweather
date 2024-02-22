@@ -49,9 +49,9 @@ class WeatherDaoTest {
         val weatherInfo = getWeather()
         //when
         weatherDao.saveWeather(weatherInfo)
-        val result = weatherDao.getWeather().take(1).toList()
+        val result = weatherDao.getWeather().take(1).toList().firstOrNull()
         //verify
-        assertEquals(result.firstOrNull()?.firstOrNull()?.name, weatherInfo.name)
+        assertEquals(result?.firstOrNull()?.name, weatherInfo.name)
     }
 
     @Test

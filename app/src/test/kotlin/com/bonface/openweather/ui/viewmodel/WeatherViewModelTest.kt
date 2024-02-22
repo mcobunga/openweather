@@ -12,6 +12,7 @@ import com.bonface.openweather.utils.TestCreationUtils.getWeather
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -20,6 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
@@ -28,16 +30,22 @@ class WeatherViewModelTest: BaseTest() {
 
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
+
     private val dispatcher = UnconfinedTestDispatcher()
 
     private val locationProvider = mockk<LocationProvider>(relaxed = true)
     private val weatherUseCase = mockk<WeatherUseCase>(relaxed = true)
+    @Mock
     private lateinit var viewModel: WeatherViewModel
 
     @Before
     override fun setup() {
         super.setup()
-        viewModel = WeatherViewModel(weatherUseCase, locationProvider, dispatcher)
+        viewModel = WeatherViewModel(
+            weatherUseCase,
+            locationProvider,
+            dispatcher
+        )
     }
 
     @After
@@ -47,7 +55,7 @@ class WeatherViewModelTest: BaseTest() {
     }
 
     @Test
-    fun `Given that viewmodel getWeatherFromRemote has been initiated, make sure that we show a loading state`() = runTest {
+    fun `Given that viewmodel getWeatherFromRemote has been initiated, make sure that we show a loading state`() = runBlocking {
         val result = MutableStateFlow<Resource<WeatherEntity>>(Resource.Loading())
         // GIVEN
         coEvery {
@@ -63,7 +71,7 @@ class WeatherViewModelTest: BaseTest() {
     }
 
     @Test
-    fun `Given that getWeatherFromRemote api call return success, make sure that we show a success state`() = runTest {
+    fun `Given that getWeatherFromRemote api call return success, make sure that we show a success state`() = runBlocking {
         val result = MutableStateFlow<Resource<WeatherEntity>>(Resource.Success(getWeather()))
         // GIVEN
         coEvery {
@@ -81,7 +89,7 @@ class WeatherViewModelTest: BaseTest() {
     }
 
     @Test
-    fun `Given that getWeatherFromRemote api call returns an error, make sure that we emit error state`() = runTest {
+    fun `Given that getWeatherFromRemote api call returns an error, make sure that we emit error state`() = runBlocking {
         val result = MutableStateFlow<Resource<WeatherEntity>>(Resource.Error(message = "Something went wrong", data = null))
         // GIVEN
         coEvery {
