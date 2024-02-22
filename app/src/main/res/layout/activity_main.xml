@@ -61,7 +61,7 @@
             tools:text="Sunny" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/last_updated_at"
+            android:id="@+id/updated_at"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -78,9 +78,9 @@
             android:layout_height="25dp"
             android:layout_marginStart="16dp"
             android:background="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="@+id/last_updated_at"
-            app:layout_constraintStart_toEndOf="@+id/last_updated_at"
-            app:layout_constraintTop_toTopOf="@+id/last_updated_at"
+            app:layout_constraintBottom_toBottomOf="@+id/updated_at"
+            app:layout_constraintStart_toEndOf="@+id/updated_at"
+            app:layout_constraintTop_toTopOf="@+id/updated_at"
             app:srcCompat="@drawable/baseline_refresh_36"
             app:tint="@color/white"
             android:contentDescription="@string/weather_icon_desc" />
@@ -91,7 +91,7 @@
             android:layout_height="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:tint="@color/purple_200"
+            app:tint="@color/white"
             android:visibility="invisible"
             app:srcCompat="@drawable/baseline_favorite_border_24"
             app:layout_constraintEnd_toStartOf="@+id/search_locations"
@@ -104,7 +104,7 @@
             android:layout_height="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:tint="@color/purple_200"
+            app:tint="@color/white"
             app:srcCompat="@drawable/baseline_search_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

@@ -33,6 +33,11 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
+      - name: Get BASE_URL
+        env:
+          BASE_URL: $
+        run: echo BASE_URL=\"$BASE_URL\" > ./local.properties
+
       - name: Get MAPS_API_KEY
         env:
           MAPS_API_KEY: $
